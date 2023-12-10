@@ -24,7 +24,7 @@ public:
     void insert(T _data, int pos); //add node with data at pos-th index
 
     int getSize() {return size;} //return size of list
-    int findIndex(T _data); //return node with matching data
+    int findIndex(T _data); //return index of node with matching data
     Node<T>* find(T _data); //return node with matching data
     bool erase(Node<T>* it); //remove the matching node from list
     T& operator[](int i); //return the data at ith node
