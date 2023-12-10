@@ -1,124 +1,137 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include <iostream>
+#include <vector>
 #include "lib/LinkedList.h"
+#include "lib/vertexDatum.h"
 
-struct nodeDatum {
-    std::string uniqueKey;
-    int cumulativeID;
-};
-
-template <class T>
 class graph {
 private:
     
     //here's the plan:
-    // we're maintaining all the node IDs in a file somewhere, and keeping it all in memory at first
-    // we're not maintaining the edges explicitly at all, we'll just have an adjacency matrix with 0 depicting no edge and some number 'x' depicting an edge
-    // the value of 'x' will vary depending on what kind of edge it is. So how do we know what edge type 'x' maps to? we'll have a separate list of edge types
+    //    we're maintaining all the vertex IDs in a file somewhere, and keeping it all in memory at first
+    //    we're not maintaining the edges explicitly at all, we'll just have an adjacency matrix with 0 depicting no edge and some number 'x' depicting an edge
+    //    the value of 'x' will vary depending on what kind of edge it is. So how do we know what edge type 'x' maps to? we'll have a separate list of edge types
 
-    //List of all node IDs
-    //we can afford to keep this in memory, since it's just a list of strings
-    //inner layer of the list is the list of all the nodes of a particular type
-    //Note that the ID of a node is unique across all nodes in its type
-    LinkedList<LinkedList<nodeDatum>> nodeData;
+    //List of all vertex IDs
+    //    we can afford to keep this in memory, since it's just a list of strings
+    //    inner layer of the list is the list of all the vertices of a particular type
+    //    Note that the ID of a vertex is unique across all vertices in its type - enforce this later
+    LinkedList<LinkedList<vertexDatum>> vertexData;
 
-    //list of all the node types
-    LinkedList<std::string> nodeTypeList;
+    //list of all the vertex types - this will be kept in memory
+    LinkedList<std::string> vertexTypeList;
 
-    //list of the all the edge types
+    //list of the all the edge types - this will be kept in memory
     LinkedList<std::string> edgeTypeList;
 
     //adjacency matrix
+    //this is the big chunk that's inefficient to store in memory, but we have no option but to do so.
     std::vector<std::vector<int>> adjMatrix;
 
-    //used for assigning cumulative IDs to nodes
-    int totalNodeCount;
+    //used for assigning cumulative IDs to vertices
+    int totalVertexCount;
 
-    //so, what are all the files that we need for (sort of) metadata?
-    //  1. nodeTypes.txt #just a sequential list of all the node types
-    //  2. edgeTypes.txt #just a sequential list of all the edge types
-    //  3. nodeIDs.txt #the general format of this file is as follows: if a line starts with an exclamation mark, then it's the name of a node type, otherwise it's the ID of a node
-    //  4. adjMatrix.txt #just a matrix of numbers, where each number represents the type of edge between the nodes at the corresponding row and column
+    //So, what are all the files that we need for (sort of) metadata?
+    //    1. vertexTypes.txt  #just a sequential list of all the vertex types
+    //    2. edgeTypes.txt    #just a sequential list of all the edge types
+    //    3. vertexIDs.txt    #the general format of this file is as follows: if a line starts with an exclamation
+    //                         mark, then it's the name of a vertex type, otherwise it's the ID of a vertex
+    //    4. adjMatrix.txt    #just a matrix of numbers, where each number represents the type of edge 
+    //                         between the vertices at the corresponding row and column
 
     //So then what is our 'actual' data?
-    //  That would be the data of all the nodes.
-    //  we can make a separate file for each node type, and store the data there sequentially
-    //  e.g if there are three nodetypes, A, B, C, then we'll have three files, A.txt, B.txt, C.txt
-    //  and each file will have the data of all the nodes of that type
+    //    That would be the data of all the vertices.
+    //    we can make a separate file for each vertex type, and store the data there sequentially
+    //    e.g if there are three vertexTypes, A, B, C, then we'll have three files, A.txt, B.txt, C.txt
+    //    and each file will have the data of all the vertices of that type
 
-    //Now, we can theoretically have random access to any given node from the file (std::streampos_t readPoint = indexOfThatNodeInItsNodeType * numberOfBytesRequiredToHoldOneNodeOfThatType)
-    //  the drawback? we would need to stuff random data into the file for each node that doesn't have data for that field
-    //  this also means that once we have defined what fields a node has, we can't add more fields to it
-    //  Now, for some nodes, this doesn't matter, e.g for an account, we don't need anything except name, email, password, and maybe a profile picture
-    //  but for other nodes, this is a problem, e.g for a post, we might want an array of strings for comments, and we might want to add more comments later
-    //  the 'solution' is to define a maximum size for 
-    //  FIGURE THIS OUT LATER (HARD DIFFICULTY)
+    //Now, we can theoretically have random access to any given vertex from the file (std::streampos_t readPoint = indexOfThatVertexInItsvertexType * numberOfBytesRequiredToHoldOneVertexOfThatType)
+    //    the drawback? we would need to stuff random data into the file for each vertex that doesn't have data for that field
+    //    this also means that once we have defined what fields a vertex has, we can't add more fields to it
+    //    Now, for some vertices, this doesn't matter, e.g for an account, we don't need anything except name, email, password, and maybe a profile picture
+    //    but for other vertices, this is a problem, e.g for a post, we might want an array of strings for comments, and we might want to add more comments later
+    //    the 'solution' is to ...
+    //    TODO: FIGURE THIS OUT LATER (HARD DIFFICULTY)
 
     
-    int IndexOfNodeTypeAmidstOtherTypes(std::string _nodeTypeLabel) {
-        int ans = nodeTypeList.findIndex(_nodeTypeLabel);
+    int verticesIndexOfVertexTypeAmidstOtherTypes(std::string _vertexTypeLabel) {
+        int ans = vertexTypeList.findIndex(_vertexTypeLabel);
         if (ans == -1) {
-            nodeTypeList.insert(_nodeTypeLabel);
-            ans = nodeTypeList.getSize();
+            vertexTypeList.insert(_vertexTypeLabel);
+            ans = vertexTypeList.getSize();
         }
         return ans;
     }
 
-    int findNodeCumulativeID(std::string _nodeTypeLabel, std::string _nodeID) {
-        //if that type doesn't exist, we out
-        int nodeTypeIndex = nodeTypeList.findIndex(_nodeTypeLabel);
-        if (nodeTypeIndex == -1)
+    int findvertexCumulativeID(std::string _vertexTypeLabel, std::string _vertexID) {
+        //if that type of vertex doesn't exist, we out
+        int vertexTypeIndex = vertexTypeList.findIndex(_vertexTypeLabel);
+        if (vertexTypeIndex == -1)
             return -1;
 
-        nodeDatum* node = nodeIDs[nodeTypeIndex].find(_nodeID);
+        Node <vertexDatum>* curr = vertexData[vertexTypeIndex].find( vertexDatum(_vertexID, 1) );
 
-        //if that node doesn't exist, we out
-        if (node == nullptr)
+        //if that vertex doesn't exist, we out
+        if (curr == nullptr)
             return -1;
 
-        return node->cumulativeID;
+        return curr->cumulativeID;
     }
 
 public:
-    void addNode (std::string _nodeTypeLabel, std::string uniqueKey, LinkedList<std::string> nodeData) {
+    void addvertex (std::string _vertexTypeLabel, std::string uniqueKey) {
 
-        //first identify the TYPE of the node from the nodeTypeList and get its index in web
-        int nodeType = IndexOfNodeTypeAmidstOtherTypes(_nodeTypeLabel);
-        
-        //then append it into the relevant list in the web 
-        nodeData[nodeType].insert(nodeDatum(uniqueKey, totalNodeCount++));
+        //first identify the TYPE of the vertex from the vertexTypeList and get its index in web
+        int vertexType = verticesIndexOfVertexTypeAmidstOtherTypes(_vertexTypeLabel);
+
+        //now search that vertexType to see if a vertex with this ID already exists, if it does, return
+        if (vertexData[vertexType].find( vertexDatum(uniqueKey, 1) ) != nullptr) {
+            std::cerr << "ERROR: A vertex with this ID already exists" << std::endl;
+            return;
+        }
+
+        //then append it into the relevant list in the web
+        vertexData[vertexType].insert( vertexDatum(uniqueKey, totalVertexCount++));
+        //we don't mind re-traversing the entire outer list in the vertexData list (via subscript), since it only holds vertex TYPES, and we're not going to have many of those anyway
 
         //then add a new row and column to the adjMatrix
+        //TODO: not sure if this is valid...
         adjMatrix.push_back(std::vector<int>(adjMatrix.size(), 0));
         for (int i = 0; i < adjMatrix.size(); i++) {
             adjMatrix[i].push_back(0);
         }
 
-        //now we need to add the data of this node into the file of its type...
-        //FIGURE THIS OUT LATER (EASY DIFFICULTY)
+        //now we need to add the data of this vertex into the file of its type...
+        //TODO: FIGURE THIS OUT LATER (EASY DIFFICULTY - just load the file in, append at the end, close the file)
     }
 
-    void addEdge (std::string _edgeTypeLabel, std::string _node1ID, std::string _node2ID) {
+    void addEdge (std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID, bool bidirectional, std::string _vertex1Type, std::string _vertex2Type) {
 
         //first identify the TYPE of the edge from the edgeTypeList and get its index in web
         int edgeType = edgeTypeList.findIndex(_edgeTypeLabel);
         //if that edge doesn't exist
         if (edgeType == -1) {
             //add it
-            edgeTypeList.insert(_edgeLabel);
+            edgeTypeList.insert(_edgeTypeLabel);
             //get its index
             edgeType = edgeTypeList.getSize();
         }
 
-        int index1 = findNodeCumulativeID(_node1ID);
-        int index2 = findNodeCumulativeID(_node2ID);
-        //FIGURE THIS OUT LATER (MEDIUM DIFFICULTY)
+        int cumIndex1 = findvertexCumulativeID(_vertex1Type, _vertex1ID);
+        int cumIndex2 = findvertexCumulativeID(_vertex2Type, _vertex2ID);
 
-        if (index1 == -1 || index2 == -1) {
-            std::cerr << "ERROR: One of the nodes doesn't exist" << std::endl;
+        if (cumIndex1 == -1 || cumIndex2 == -1) {
+            std::cerr << "ERROR: One of the vertices doesn't exist" << std::endl;
             return;
         }
 
         //then add a new row and column to the adjMatrix
-        //the problem is that the adjMatrix holds the nodes in the order in which they were added, so we need a way to figure out the cumulative index...
+        adjMatrix[cumIndex1][cumIndex2] = edgeType;
+        if (bidirectional)
+            adjMatrix[cumIndex2][cumIndex1] = edgeType;
     }
 };
+
+#endif //GRAPH_H

@@ -7,9 +7,9 @@
 template <class T>
 class LinkedList
 {
-    int size;
     Node<T>* head;
     Node<T>* tail;
+    int size;
 public:
     LinkedList() : head(nullptr), tail(nullptr), size(0) {} //initialize both pointers with nullptr
     LinkedList(T _data) : head(new Node<T>(_data)), tail(head), size(1) {} //LL with one element
@@ -176,7 +176,9 @@ inline LinkedList<T> &LinkedList<T>::operator=(const LinkedList &L) {
     //check if assigning to itself
     if(this == &L)
         return *this;
-    
+    //else
+
+    //deallocate head and tail
     head = tail = nullptr;
     
     //if L is empty...
@@ -193,6 +195,7 @@ inline LinkedList<T> &LinkedList<T>::operator=(const LinkedList &L) {
             tail = tail->next;
         }
     }
+
     size = L.size;
     return *this;
 }
@@ -204,11 +207,11 @@ inline LinkedList<T>::LinkedList(int _size) {
     if(_size == 0) {return;}
     if(_size < 0) {throw std::out_of_range("Size cannot be negative");}
     for (int i = 0; i < _size; i++) {
-        // If the list is empty, init a node.
+        //If the list is empty, init a node.
         if (head == nullptr) {
             head = new Node<T>();
             tail = head;
-        // else append a new node to the end of the list
+        //else append a new node to the end of the list
         } else {
             tail->next = new Node<T>();
             tail = tail->next;
@@ -272,6 +275,7 @@ inline void LinkedList<T>::insert(T _data, int pos) {
         Node<T>* newNode = new Node<T> (_data);
         newNode->next = head;
         head = newNode;
+        
     //else if normal insertion
     } else {
         Node<T>* node = head;
