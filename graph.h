@@ -8,11 +8,6 @@
 
 class graph {
 private:
-    
-    //here's the plan:
-    //    we're maintaining all the vertex IDs in a file somewhere, and keeping it all in memory at first
-    //    we're not maintaining the edges explicitly at all, we'll just have an adjacency matrix with 0 depicting no edge and some number 'x' depicting an edge
-    //    the value of 'x' will vary depending on what kind of edge it is. So how do we know what edge type 'x' maps to? we'll have a separate list of edge types
 
     //List of all vertex IDs
     //    we can afford to keep this in memory, since it's just a list of strings
@@ -31,15 +26,22 @@ private:
     std::vector<std::vector<int>> adjMatrix;
 
     //used for assigning cumulative IDs to vertices
+    //will be kept on the first line in the vertexIDs.txt file
     int totalVertexCount;
 
-    //So, what are all the files that we need for (sort of) metadata?
-    //    1. vertexTypes.txt  #just a sequential list of all the vertex types
-    //    2. edgeTypes.txt    #just a sequential list of all the edge types
-    //    3. vertexIDs.txt    #the general format of this file is as follows: if a line starts with an exclamation
-    //                         mark, then it's the name of a vertex type, otherwise it's the ID of a vertex
-    //    4. adjMatrix.txt    #just a matrix of numbers, where each number represents the type of edge 
-    //                         between the vertices at the corresponding row and column
+    //here's the plan:
+    //    we're maintaining all the vertex IDs in a file somewhere, and keeping it all in memory too
+    //    we're not maintaining the edges explicitly AT ALL, we'll just have an adjacency matrix with 0 depicting no edge and some number 'x' depicting an edge's existence
+    //    the value of 'x' will vary depending on what KIND of edge it is. So, how do we know what edge _type_ 'x' maps to? We'll be keeping a separate list of edge types.
+
+    //So, what are all the files that we need for (sort of?) metadata?
+    //    1. vertexTypes.txt   #just a sequential list of all the vertex types
+    //    2. edgeTypes.txt     #just a sequential list of all the edge types
+    //    3. vertexData.txt    #the general format of this file is as follows: the first line has the TOTAL NUMBER of vertices.
+    //                          if a line starts with an exclamation mark, then it's the NAME of a vertex TYPE, 
+    //                          otherwise it's the "UNIQUE-KEY~cumID" of a vertex with '~' as the delimiter
+    //    4. adjMatrix.txt     #just a matrix of numbers, where each number represents the type of edge 
+    //                          between the vertices at the corresponding row and column
 
     //So then what is our 'actual' data?
     //    That would be the data of all the vertices.
@@ -47,14 +49,13 @@ private:
     //    e.g if there are three vertexTypes, A, B, C, then we'll have three files, A.txt, B.txt, C.txt
     //    and each file will have the data of all the vertices of that type
 
-    //Now, we can theoretically have random access to any given vertex from the file (std::streampos_t readPoint = indexOfThatVertexInItsvertexType * numberOfBytesRequiredToHoldOneVertexOfThatType)
+    //Now, we can theoretically have random access to any given vertex from the file (std::streampos_t readPoint = indexOfThatVertexInItsVertexType * numberOfBytesRequiredToHoldOneVertexOfThatType)
     //    the drawback? we would need to stuff random data into the file for each vertex that doesn't have data for that field
     //    this also means that once we have defined what fields a vertex has, we can't add more fields to it
     //    Now, for some vertices, this doesn't matter, e.g for an account, we don't need anything except name, email, password, and maybe a profile picture
     //    but for other vertices, this is a problem, e.g for a post, we might want an array of strings for comments, and we might want to add more comments later
     //    the 'solution' is to ...
     //    TODO: FIGURE THIS OUT LATER (HARD DIFFICULTY)
-
     
     int verticesIndexOfVertexTypeAmidstOtherTypes(std::string _vertexTypeLabel) {
         int ans = vertexTypeList.findIndex(_vertexTypeLabel);
@@ -77,17 +78,24 @@ private:
         if (curr == nullptr)
             return -1;
 
-        return curr->cumulativeID;
+        return curr->data.cumulativeID;
     }
 
 public:
+
+    //basic ass constructor
+    graph() : totalVertexCount(0) {};
+
+    //constructor that loads info from files
+    // graph();
+
     void addvertex (std::string _vertexTypeLabel, std::string uniqueKey) {
 
         //first identify the TYPE of the vertex from the vertexTypeList and get its index in web
         int vertexType = verticesIndexOfVertexTypeAmidstOtherTypes(_vertexTypeLabel);
 
         //now search that vertexType to see if a vertex with this ID already exists, if it does, return
-        if (vertexData[vertexType].find( vertexDatum(uniqueKey, 1) ) != nullptr) {
+        if ( vertexData[vertexType].find( vertexDatum(uniqueKey, 1) ) != nullptr ) {
             std::cerr << "ERROR: A vertex with this ID already exists" << std::endl;
             return;
         }
