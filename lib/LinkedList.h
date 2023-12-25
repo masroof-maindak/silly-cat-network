@@ -26,6 +26,7 @@ public:
     int getSize() {return size;} //return size of list
     int findIndex(T _data); //return index of node with matching data
     Node<T>* find(T _data); //return node with matching data
+    bool exists(T _data); //return node with matching data
     bool erase(Node<T>* it); //remove the matching node from list
     T& operator[](int i); //return the data at ith node
     LinkedList& operator=(const LinkedList & L);//create a deep copy
@@ -159,6 +160,15 @@ inline Node<T>* LinkedList<T>::getMid() {
     }
 
     return nullptr;
+}
+
+//exists or not?
+template <class T>
+inline bool LinkedList<T>::exists(T _data) {
+    for (Node<T>* node = head; node != nullptr; node = node->next)
+        if (node->data == _data)
+            return true;
+    return false;
 }
 
 //searcher

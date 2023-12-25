@@ -1,3 +1,6 @@
+//I'm pretty sure this is junk now but I'm keeping it around just for backup purposes.
+
+/*
 #ifndef VERTEXDATUM_H 
 #define VERTEXDATUM_H
 
@@ -17,3 +20,4 @@ struct vertexDatum {
 };
 
 #endif
+*/
