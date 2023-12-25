@@ -6,19 +6,21 @@
 #include "lib/LinkedList.h"
 // #include "lib/bTree.h"
 
+// Note: LL = LinkedList<std::string>
+
 class graph {
 private:
 
     // 1. 
     // An array of b trees, each index of the array holds a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
-    LinkedList<LinkedList<std::string>> vertexData; //TODO: change this init eventually
+    LinkedList<LL> vertexData; //TODO: change this init eventually
     
 
     // 2/3.
     // list of all the vertex/edge types - this will be kept in memory and read/written to disk at program start/end
-    LinkedList<std::string> vertexTypeList;
-    LinkedList<std::string> edgeTypeList;
+    LL vertexTypeList;
+    LL edgeTypeList;
 
 
     // 4.
@@ -41,7 +43,7 @@ private:
     * But the performance difference for a small number of nodes won't be huge so this is skippable for now.
 
     */
-    std::vector < std::pair < std::string, std::pair < std::string, LinkedList<std::string> > > > adjListArray;
+    std::vector < std::pair < std::string, std::pair < std::string, LL > > > adjListArray;
 
 
     /* 

@@ -8,19 +8,16 @@
 template <class T>
 class LinkedList
 {
+protected:
     Node<T>* head;
     Node<T>* tail;
     int size;
 public:
     // Constructors
     LinkedList() : head(nullptr), tail(nullptr), size(0) {} //Empty
-    LinkedList(T _data) : head(new Node<T>(_data)), tail(head), size(1) {} //LL with one element
+    LinkedList(T _data) : head(new Node<T>(_data)), tail(head), size(1) {} //list with one element
     LinkedList(int _size); // create linked list of given size
     
-    // Serialization/Deserialization
-    LinkedList(std::string filename); // (Constructor)
-    void writeToFile (std::string filename);
-
     // Deep Copy
     LinkedList(const LinkedList& L); // (Constructor)
     LinkedList& operator=(const LinkedList & L);
@@ -46,6 +43,7 @@ public:
     friend std::ostream& operator<<(std::ostream& _cout, const LinkedList<U> &L);
     
     // Miscellaneous
+    void writeToFile (std::string filename);
     int getSize() {return size;} //return size of list
     void reverse(); //reverse the linked list in O(N) time complexity
     Node<T>* getMid(); //return the middle node of the linked list
@@ -54,22 +52,25 @@ public:
     ~LinkedList();
 };
 
-//serialize LL from file
-template<class T>
-inline LinkedList<T>::LinkedList (std::string filename) {
-    std::ifstream file(filename);
-    if(!file.is_open()) {
-        std::cout << "File not found." << std::endl;
-        return;
+//inherit string only LinkedList class
+class LL: public LinkedList<std::string> {
+public:
+    LL(std::string filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            std::cout << "File not found." << std::endl;
+            return;
+        }
+
+        this->head = this->tail = nullptr;
+        this->size = 0;
+
+        std::string line;
+        while (getline(file, line)) {
+            this->insert(line);
+        }
     }
-
-    head = tail = nullptr;
-    size = 0;
-
-    T data;
-    while (file >> data)
-        insert(data);
-}
+};
 
 //deserialize
 template<class T>
