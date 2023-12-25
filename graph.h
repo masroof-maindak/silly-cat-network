@@ -30,7 +30,8 @@ private:
     //    3. vertexData.txt    #the general format of this file is as follows: the first line has the TOTAL NUMBER of vertices.
     //                          if a line starts with an exclamation mark, then it's the NAME of a vertex TYPE, 
     //                          otherwise it's the "UNIQUE-KEY~cumID" of a vertex with '~' as the delimiter
-    //    4. AdjList.txt 
+    //    4. AdjList.txt       #in a directory called adjLists, every adj. list will be stored by the name of the relation it's denoting
+    //                         #the contents will look like so: freegoblinpics~monkeycatluna, with '~' as the delimiter
 
     //So then what is our 'actual' data?
     //    That would be the data of all the vertices.
@@ -55,7 +56,9 @@ private:
         }
         return ans;
     }
-
+    
+    //pretty sure this is now pointless but keeping this around for now
+    /*
     //return a vertex' CUMULATIVE INTEGER ID (i.e what number of vertex was it at the time it was inserted)
     int findvertexCumulativeID(std::string _vertexTypeLabel, std::string _vertexID) {
         //if that type of vertex doesn't exist, we out
@@ -71,6 +74,7 @@ private:
 
         return curr->data.cumulativeID;
     }
+    */
 
 public:
 
@@ -100,7 +104,9 @@ public:
         return true;
     }
 
-    void addEdge (std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID, bool bidirectional, std::string _vertex1Type, std::string _vertex2Type) {
+    void addEdge (std::string _edgeTypeLabel, bool bidirectional,
+                  std::string _vertex1ID, std::string _vertex2ID, 
+                  std::string _vertex1Type, std::string _vertex2Type) {
 
         //first identify the TYPE of the edge from the edgeTypeList
         int edgeType = getIndexOfTypeOfEdge(_edgeTypeLabel);
@@ -111,6 +117,8 @@ public:
         //TODO:
         //check if relation type exists, if it does, go through vertex1's adj. list element and append in vertex2
         //if not, first add this relation type to the vector
+        
+        //if bidrectional, do the same for the other way around
 };
 
 #endif //GRAPH_H
