@@ -4,59 +4,44 @@
 #include <iostream>
 #include <vector>
 #include "lib/LinkedList.h"
-// #include "lib/bTree.h"
+// #include "lib/vertexDatum.h"
 
 class graph {
 private:
 
-    // 1. 
-    // An array of b trees, each index of the array holds a btree that corresponds to the index of that vertex type in the vertexTypeList
-    // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
+    //An array of b trees, each index of the array holds a btree that corresponds to the edge type in the edgeTypeList
+    //Each b tree holds only the unique identifiers of all graph vertices in that edge type
     LinkedList<LinkedList<std::string>> vertexData; //TODO:change this init eventually
-    
 
-    // 2/3.
-    // list of all the vertex/edge types - this will be kept in memory and read/written to disk at program start/end
+    //list of all the vertex/edge types - this will be kept in memory and read/written at program run/closing
     LinkedList<std::string> vertexTypeList;
     LinkedList<std::string> edgeTypeList;
+    LinkedList<std::string> adjListType; //string of what a certain type of adjacency list holds, e.g "cat_cat", "cat_post", etc.
 
-
-    // 4.
-    /*
-    STORING EDGES:
-
-    * vector of pair of string and adj. list, where the 
-    * `first` in outer pair tells what its corresponding '`second`' holds, e.g "cat_cat", "cat_post", etc.
-    * first's `second` is a pair itself and forms an adjacency list
-    * where `first` is a string and `second` is a linked list of all the nodes that have a relation with `first` 
-    
-    BETTER APPROACH:
-
-    * for optimisation purposes, if we know we are expecting a large number of vertex types with a lot of intervertex relations,
-    * we can make an unordered set of adjacency lists where the key is the node type from whom the edge is originating
-    * and the value is the 'to' node type which the 'sender' node type has a relation with. For instance if the values 'cat' and 'post'
-    * (i.e the pair where 'cat' is `first` and the adj. list of cat is `second`) lie in the same chain, say, for 'cat,' it means that
-    * the cat_cat and cat_post relations do exist and at least one edge was added there at some point
-    * But the performance difference for a small number of nodes won't be huge so this is skippable for now.
-
-    */
+    //vector of pair of string and adj. list
+    //`first` in outer pair tells what its corresponding '`second`' holds, e.g "cat_cat", "cat_post", etc.
+    //first's `second` is a pair itself and the inner adjacency list
+    //inner pair is adj. list where `first` is a string and `second` is a linked list of all the nodes that have a relation with `first`
     std::vector< std::pair < std::string, std::pair < std::string, LinkedList<std::string> > > >;
 
-
-    /* 
-    FILE STRUCTURE:
-
-    *  1. vertexTypes.txt              - just a sequential list of all the vertex types
-
-    *  2. edgeTypes.txt                - just a sequential list of all the edge types
-
-       3. adjLists/type1_type2.txt     - every adj. list will be stored by the name of the relation it's denoting
-    *                                  - the contents will look like so: freegoblinpics~monkeycatluna, with '~' as the delimiter
-
-    *   4. btrees/type1/vert1.txt      - stores all the properties in a file, one file per vertex
-    *                                  - VERTEX_DATA/NODETYPE/VERTEX_UNIQUE_KEY.bin
-
+    /*
+    for optimisation purposes, if we know we are expecting a large number of vertex types with a lot of intervertex relations,
+    we can make an unordered set of adjacency lists where the key is the node type from whom the edge is originating
+    e.g cat_cat, cat_post will be in one 'chain' of the unorderet set, whereas post_cat, post_comment, will be in another.
     */
+
+    //So, what are all the files that we need for (sort of?) metadata?
+    //    1. vertexTypes.txt   #just a sequential list of all the vertex types
+    //    2. edgeTypes.txt     #just a sequential list of all the edge types
+    //    3. vertexData.txt    #the general format of this file is as follows: the first line has the TOTAL NUMBER of vertices.
+    //                          if a line starts with an exclamation mark, then it's the NAME of a vertex TYPE, 
+    //                          otherwise it's the "UNIQUE-KEY~cumID" of a vertex with '~' as the delimiter
+    //    4. AdjList.txt       #in a directory called adjLists, every adj. list will be stored by the name of the relation it's denoting
+    //                         #the contents will look like so: freegoblinpics~monkeycatluna, with '~' as the delimiter
+
+    //So then what is our 'actual' data?
+    //    That would be the data of all the vertices.
+    //    we store all the properties in a file, one per vertex, inside `VERTEX_DATA/NODETYPE/VERTEX_UNIQUE_KEY.bin`
     
     //get the index of that TYPE of vertex. And if it doesn't exist, then put it in the list and return the index
     int getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
@@ -119,8 +104,7 @@ public:
         //TODO:
         //check if relation type exists, and get the index
         //if not, first add this relation type to the vector, and get the size
-
-        //go through vertex1's adj. list element and append in vertex2
+        //then, go through vertex1's adj. list element and append in vertex2
         //if bidrectional, do the same for the other way around
 };
 
