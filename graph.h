@@ -14,7 +14,7 @@ private:
     // 1. 
     // An array of b trees, each index of the array holds a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
-    LinkedList<LL> vertexData; //TODO: change this init eventually
+    // std::vector<bTree> bTreeArray;
     
 
     // 2/3.
@@ -69,6 +69,7 @@ private:
         int ans = vertexTypeList.findIndex(_vertexTypeLabel);
         if (ans == -1) {
             vertexTypeList.insert(_vertexTypeLabel);
+            //TODO: Also init a new btree at this index in the bTreeArray
             ans = vertexTypeList.getSize();
         }
         return ans;
@@ -90,22 +91,28 @@ public:
     graph();
 
     //constructor that loads info from files
-    // graph();
+    graph(int dummy); 
 
     bool addVertex (std::string _vertexTypeLabel, std::string uniqueKey) {
         
         // Identify the TYPE of the vertex from the vertexTypeList
         int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
-        bool exists = false;
+        bool exists = true;
 
-        //TODO: search in B tree array at vertexType-th index and check if that vertex exists already
+        // Search in B tree array at vertexType-th index and check if that vertex exists already
+        /*
+        if (bTreeArray[vertexType].search(uniqueKey) == nullptr)
+            exists = false
+        */
 
         if (exists)
             return false;
 
         //if it doesn't
-        //TODO: insert it in btree
+        /*
+        bTreeArray[vertexType].insert(uniqueKey);
+        */
 
         //TODO: now we need to add the data of this vertex into its file (remember that each vertex has its own file)
 

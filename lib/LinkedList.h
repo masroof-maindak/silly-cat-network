@@ -52,7 +52,7 @@ public:
     ~LinkedList();
 };
 
-//inherit string only LinkedList class
+//inherit string-only LinkedList class
 class LL: public LinkedList<std::string> {
 public:
     LL(std::string filename) {
