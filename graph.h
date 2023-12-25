@@ -12,7 +12,7 @@ private:
     // 1. 
     // An array of b trees, each index of the array holds a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
-    LinkedList<LinkedList<std::string>> vertexData; //TODO:change this init eventually
+    LinkedList<LinkedList<std::string>> vertexData; //TODO: change this init eventually
     
 
     // 2/3.
@@ -23,6 +23,7 @@ private:
 
     // 4.
     /*
+
     STORING EDGES:
 
     * vector of pair of string and adj. list, where the 
@@ -40,10 +41,11 @@ private:
     * But the performance difference for a small number of nodes won't be huge so this is skippable for now.
 
     */
-    std::vector< std::pair < std::string, std::pair < std::string, LinkedList<std::string> > > >;
+    std::vector < std::pair < std::string, std::pair < std::string, LinkedList<std::string> > > > adjListArray;
 
 
     /* 
+
     FILE STRUCTURE:
 
     *  1. vertexTypes.txt              - just a sequential list of all the vertex types
@@ -55,10 +57,12 @@ private:
 
     *   4. btrees/type1/vert1.txt      - stores all the properties in a file, one file per vertex
     *                                  - VERTEX_DATA/NODETYPE/VERTEX_UNIQUE_KEY.bin
+    *                                  - Only category being updated in real-time thanks to b trees
+    *                                  - The rest will be written to when the program ends
 
     */
     
-    //get the index of that TYPE of vertex. And if it doesn't exist, then put it in the list and return the index
+    // Get the index of that TYPE of vertex. If it doesn't exist, put it in the list and return the index
     int getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
         int ans = vertexTypeList.findIndex(_vertexTypeLabel);
         if (ans == -1) {
@@ -68,7 +72,7 @@ private:
         return ans;
     }
 
-    //get the index of that TYPE of edge. And if it doesn't exist, then put it in the list and return the index
+    // Get the index of that TYPE of edge. If it doesn't exist, put it in the list and return the index
     int getIndexOfTypeOfEdge(std::string _edgeTypeLabel) {
         int ans = edgeTypeList.findIndex(_edgeTypeLabel);
         if (ans == -1) {
@@ -81,18 +85,18 @@ private:
 public:
 
     //basic ass constructor
-    graph() : totalVertexCount(0) {};
+    graph();
 
     //constructor that loads info from files
     // graph();
 
     bool addVertex (std::string _vertexTypeLabel, std::string uniqueKey) {
-        flag = "null";
-
+        
         // Identify the TYPE of the vertex from the vertexTypeList
         int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
         bool exists = false;
+
         //TODO: search in B tree array at vertexType-th index and check if that vertex exists already
 
         if (exists)
@@ -122,6 +126,8 @@ public:
 
         //go through vertex1's adj. list element and append in vertex2
         //if bidrectional, do the same for the other way around
+    }
+
 };
 
 #endif //GRAPH_H

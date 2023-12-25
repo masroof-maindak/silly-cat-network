@@ -2,6 +2,7 @@
 #define LINKEDLIST_H
 
 #include <iostream>
+#include <fstream>
 #include "Node.h"
 
 template <class T>
@@ -11,36 +12,77 @@ class LinkedList
     Node<T>* tail;
     int size;
 public:
-    LinkedList() : head(nullptr), tail(nullptr), size(0) {} //initialize both pointers with nullptr
+    // Constructors
+    LinkedList() : head(nullptr), tail(nullptr), size(0) {} //Empty
     LinkedList(T _data) : head(new Node<T>(_data)), tail(head), size(1) {} //LL with one element
+    LinkedList(int _size); // create linked list of given size
     
-    LinkedList(int _size); //create linked list of given size
-    LinkedList(const LinkedList& L); //create a deep copy
+    // Serialization/Deserialization
+    LinkedList(std::string filename); // (Constructor)
+    void writeToFile (std::string filename);
 
+    // Deep Copy
+    LinkedList(const LinkedList& L); // (Constructor)
+    LinkedList& operator=(const LinkedList & L);
+
+    // Getters
     Node<T>* begin() {return head;} //return head
     Node<T>* end() {return tail;} // return tail
 
+    // Insertion
     void insert(T _data); //add node with data at the end of list
     void insert(T _data, int pos); //add node with data at pos-th index
 
-    int getSize() {return size;} //return size of list
+    // Searching
     int findIndex(T _data); //return index of node with matching data
     Node<T>* find(T _data); //return node with matching data
-    bool exists(T _data); //return node with matching data
-    bool erase(Node<T>* it); //remove the matching node from list
+    bool exists(T _data); //return node with matching _data
     T& operator[](int i); //return the data at ith node
-    LinkedList& operator=(const LinkedList & L);//create a deep copy
 
+    bool erase(Node<T>* it); //remove the matching node from list
+    
+    // Printing to console
     template <class U>
-    friend std::ostream& operator<<(std::ostream& _cout, const LinkedList<U> &L); //print
+    friend std::ostream& operator<<(std::ostream& _cout, const LinkedList<U> &L);
     
+    // Miscellaneous
+    int getSize() {return size;} //return size of list
     void reverse(); //reverse the linked list in O(N) time complexity
-    
     Node<T>* getMid(); //return the middle node of the linked list
-                       //getMid() is not allowed to count/use size of list!
     
-    ~LinkedList(); //deallocate all nodes
+    // Destructor
+    ~LinkedList();
 };
+
+//serialize LL from file
+template<class T>
+inline LinkedList<T>::LinkedList (std::string filename) {
+    std::ifstream file(filename);
+    if(!file.is_open()) {
+        std::cout << "File not found." << std::endl;
+        return;
+    }
+
+    head = tail = nullptr;
+    size = 0;
+
+    T data;
+    while (file >> data)
+        insert(data);
+}
+
+//deserialize
+template<class T>
+void LinkedList<T>::writeToFile(std::string filename) {
+    std::ofstream file(filename);  
+    if(!file.is_open()) {
+        std::cout << "File not found." << std::endl;
+        return;
+    }
+
+    for(Node<T>* node = head; node != nullptr; node = node->next)
+        file << node->data << "\n";
+}
 
 //get index of a value
 template<class T>
