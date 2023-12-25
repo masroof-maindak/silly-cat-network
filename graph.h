@@ -50,17 +50,17 @@ private:
 
     FILE STRUCTURE:
 
-    *  1. vertexTypes.txt              - just a sequential list of all the vertex types
+    *  1. vertexTypes.txt             - just a sequential list of all the vertex types
 
-    *  2. edgeTypes.txt                - just a sequential list of all the edge types
+    *  2. edgeTypes.txt               - just a sequential list of all the edge types
 
-       3. adjLists/type1_type2.txt     - every adj. list will be stored by the name of the relation it's denoting
-    *                                  - the contents will look like so: freegoblinpics~monkeycatluna, with '~' as the delimiter
+    *  3. adjLists/type1_type2.txt    - every adj. list will be stored by the name of the relation it's denoting
+    *                                 - the contents will look like so: freegoblinpics~monkeycatluna, with '~' as the delimiter
 
-    *   4. btrees/type1/vert1.txt      - stores all the properties in a file, one file per vertex
-    *                                  - VERTEX_DATA/NODETYPE/VERTEX_UNIQUE_KEY.bin
-    *                                  - Only category being updated in real-time thanks to b trees
-    *                                  - The rest will be written to when the program ends
+    *   4. btrees/type1/vert1.txt     - stores all the properties in a file, one file per vertex
+    *                                 - VERTEX_DATA/NODETYPE/VERTEX_UNIQUE_KEY.bin
+    *                                 - Only category being updated in real-time thanks to b trees
+    *                                 - The rest will be written to when the program ends
 
     */
     
