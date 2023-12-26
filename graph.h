@@ -25,7 +25,8 @@ private:
 
     // 1. 
     // An array of b trees, each index of the array denotes a btree that corresponds to the index of that vertex type in the vertexTypeList
-    // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
+    // Each b tree holds only the unique identifiers of all graph vertices of that vertex type
+    //TODO: remove comment when btreeArr finalized
     // std::vector<bTree> bTreeArray;
     
     // 2/3.
@@ -80,11 +81,11 @@ public:
     graph();                  // default
     graph(int fileCheckFlag); // file-based
 
-    bool addVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
+    bool addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
     bool addEdge (std::string _edgeTypeLabel, bool bidirectional,
                   std::string _vertex1ID, std::string _vertex2ID, 
                   std::string _vertex1Type, std::string _vertex2Type);
-    void mergeVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
+    void mergeVertex (std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
 
     //TODO: Filter functions + Relational Queries
 
@@ -192,7 +193,8 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
     int ans = vertexTypeList.findIndex(_vertexTypeLabel);
     if (ans == -1) {
         vertexTypeList.insert(_vertexTypeLabel);
-        //TODO: Init a new btree in the bTreeArray with name '_vertexTypeLabel'
+        //TODO: Remove comment when btreeArr finalized
+        // bTreeArray.push_back(bTree(_vertexTypeLabel, 0));
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize();
     }
@@ -209,7 +211,7 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
     // Search in B tree array at vertexType-th index and check if that vertex exists already
     //TODO: remove comment when btreeArr finalized
     /*
-    if (bTreeArray[vertexType].search(uniqueKey) == nullptr)
+    if (bTreeArray[vertexType].search(uniqueKey) == false)
         exists = false
     */
 
@@ -217,9 +219,7 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
         return false;
 
     //TODO: remove comment when btreeArr finalized
-    /*
-    bTreeArray[vertexType].insert(uniqueKey);
-    */
+    //bTreeArray[vertexType].insert(uniqueKey);
 
     //_vertexProperties is in form: "key1:value1~key2:value2~...keyN:valueN~"
 
