@@ -12,7 +12,7 @@ class graph {
 private:
 
     // 1. 
-    // An array of b trees, each index of the array holds a btree that corresponds to the index of that vertex type in the vertexTypeList
+    // An array of b trees, each index of the array denotes a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
     // std::vector<bTree> bTreeArray;
     
@@ -26,35 +26,21 @@ private:
     // 4.
     /*
 
-    STORING EDGES:
-
-    * vector of pair of string and adj. list, where the 
-    * `first` in outer pair tells what its corresponding '`second`' holds, e.g "cat_cat", "cat_post", etc.
-    * first's `second` is a pair itself and forms an adjacency list
-    * where `first` is a string and `second` is a linked list of all the nodes that have a relation with `first` 
-    
-    BETTER APPROACH:
-
-    * for optimisation purposes, if we know we are expecting a large number of vertex types with a lot of intervertex relations,
-    * we can make an unordered set of adjacency lists where the key is the node type from whom the edge is originating
-    * and the value is the 'to' node type which the 'sender' node type has a relation with. For instance if the values 'cat' and 'post'
-    * (i.e the pair where 'cat' is `first` and the adj. list of cat is `second`) lie in the same chain, say, for 'cat,' it means that
-    * the cat_cat and cat_post relations do exist and at least one edge was added there at some point
-    * But the performance difference for a small number of nodes won't be huge so this is skippable for now.
+    * vector of pair of AdjList
+    * first is string - vertex of typeX where relation is coming FROM
+    * second is LL<string> - every element denotes a vertex where relation is going TO
 
     */
-    std::vector < std::pair < std::string, std::pair < std::string, LL > > > adjListArray;
+    //each index denotes an edgeType corresponding to the same index in edgeTypeList
+    std::vector < std::pair < std::string, LL > > adjListArray;
 
-
-    
-    
     // Get the index of that TYPE of vertex. If it doesn't exist, put it in the list and return the index
     int getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
         int ans = vertexTypeList.findIndex(_vertexTypeLabel);
         if (ans == -1) {
             vertexTypeList.insert(_vertexTypeLabel);
-            //TODO: Also init a new btree at this index in the bTreeArray with name '_vertexTypeLabel'
-            //TODO: Also make a new directory data/bTrees/'_vertexTypeLabel'/
+            //TODO: Init a new btree in the bTreeArray with name '_vertexTypeLabel'
+            //TODO: Make a new directory _data/bTrees/'_vertexTypeLabel'/
             ans = vertexTypeList.getSize();
         }
         return ans;
@@ -65,9 +51,8 @@ private:
         int ans = edgeTypeList.findIndex(_edgeTypeLabel);
         if (ans == -1) {
             edgeTypeList.insert(_edgeTypeLabel);
-            //TODO: Also append the file's name to adjLists/infofile.txt
-            //TODO: Also make a new directory in adjLists/ with name 'type1_type2'
-            //TODO: Also make a new entry in adjListArray
+            //TODO: init a new adjList in adjListArray (make_pair<string, LL>())
+            //TODO: make a new directory _data/adjLists/'type1_type2'/
             ans = edgeTypeList.getSize();
         }
         return ans;
@@ -80,18 +65,17 @@ private:
 
         FILE STRUCTURE:
 
-        *  1. _data/vertexTypes.txt                  - just a sequential list of all the vertex types
+        *  1. _data/vertexTypes.txt                  - just a sequential list of all the vertex types e.g typeX\ntypeY...
 
-        *  2. _data/edgeTypes.txt                    - just a sequential list of all the edge types
+        *  2. _data/edgeTypes.txt                    - just a sequential list of all the edge types, e.g typeX_typeY\ntypeA_typeB...
 
-        *  3. _data/adjLists/infofile.txt            - Going to have an infofile.txt in adjLists, where each line is (i) in format typeX_typeY, and (ii) denotes a directory
-        *     _data/adjLists/typeX_typeY/vertZ.txt   - where typeX is a name of a vertex type, and typeY is another vertex type
+        *  3. _data/adjLists/typeX_typeY/vertZ.txt   - Read edgeTypesList, where each entry denotes a directory
+        *                                            - where typeX is a name of a vertex type, and typeY is another vertex type
         *                                            - the contents of each directory are as follows: a list of files of with name vertZ.txt, where vertZ is a vertex of typeX 
-        *                                            - Each vertZ.txt file comprises a list of vertices of typeY that have a relation with vertexZ (FROM vertZ TO [vertices in vertZ.txt])
+        *                                            - Each vertZ.txt file comprises a list of strings of vertices of typeY that have a relation with vertexZ (FROM vertZ TO [vertices in vertZ.txt])
         *                                            - the contents of a vertZ.txt file can then be passed to the LL constructor to deserialize it
  
-        *  4. _data/btrees/typeX/vertZ.txt            stores all the properties in a file, one file per vertex
-        *                                            - No need for an infofile.txt in btrees/, as we can just check vertexTypes
+        *  4. _data/btrees/typeX/infofile.txt...     - stores all the properties in a file, one file per vertex
         *                                            - Only category being updated in real-time thanks to b trees
         *                                            - The rest will be written to when the program ends
  
