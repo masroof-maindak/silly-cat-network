@@ -55,11 +55,14 @@ public:
 //inherit string-only LinkedList class
 class LL: public LinkedList<std::string> {
 public:
-    //Reads a file and throws every string it finds into a LinkedList<string>
+    // Default Constructor
+    LL() : LinkedList<std::string>() {}
+
+    // File-based constructor
     LL(std::string filename) {
         std::ifstream file(filename);
         if (!file.is_open()) {
-            std::cout << "File not found." << std::endl;
+            std::cout << "File to deserialize LL<string> from not found." << std::endl;
             return;
         }
 
@@ -73,14 +76,26 @@ public:
 
         file.close();
     }
+
+    //Constructor with one value
+    LL(std::string _data, int dummy) : LinkedList<std::string>(_data) {}
+
+    // Dump to vector<string>
+    std::vector<std::string> vecDump() {
+        std::vector<std::string> ans;
+        for (Node<std::string>* node = this->head; node != nullptr; node = node->next) {
+            ans.push_back(node->data);
+        }
+        return ans;
+    }
 };
 
-//deserialize
+//serialize
 template<class T>
 void LinkedList<T>::writeToFile(std::string filename) {
     std::ofstream file(filename);  
     if(!file.is_open()) {
-        std::cout << "File not found." << std::endl;
+        std::cout << "File to serialize LL to not found." << std::endl;
         return;
     }
 

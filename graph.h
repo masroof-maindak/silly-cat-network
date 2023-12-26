@@ -4,134 +4,195 @@
 #include <iostream>
 #include <vector>
 #include "lib/LinkedList.h"
+#include "lib/adjacencyList.h"
 #include <unordered_map>
 #include <sstream>
 // #include "lib/bTree.h"
 
 // Note: LL = LinkedList<std::string>
 
+void makeDir(std::string path, std::string newDirName) {
+    std::string command = "mkdir -p " + path + newDirName;
+    system(command.c_str());
+}
+
 class graph {
 private:
+
+    /*
+    CORE DATA STRUCTURES:
+    */
 
     // 1. 
     // An array of b trees, each index of the array denotes a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices in that vertex type
     // std::vector<bTree> bTreeArray;
     
-
     // 2/3.
     // list of all the vertex/edge types - this will be kept in memory and read/written to disk at program start/end
     LL vertexTypeList;
     LL edgeTypeList;
 
-
     // 4.
+    // vector of linked list of AdjList
+    // Each index holds a set of adjLists that correspond to the index of that edge type in the edgeTypeList
+    std::vector<LinkedList<adjList>> adjListArray;
+
     /*
-
-    * vector of pair of AdjList
-    * first is string - vertex of typeX where relation is coming FROM
-    * second is LL<string> - every element denotes a vertex where relation is going TO
-
+    FILE STRUCTURE:
+    *  1. _data/vertexTypes.txt                  - just a sequential list of all the vertex types e.g typeX\ntypeY...
+    
+    *  2. _data/edgeTypes.txt                    - just a sequential list of all the edge types, e.g Relation:typeX_typeY\ntypeA_typeB...
+    
+    *  3. _data/adjLists/rel-typeX_typeY/z.txt   - Read edgeTypesList, where each entry denotes a directory
+    *                                            - infofile.txt is a list of all the files in that directory, one file per line, without the .txt extension
+    *                                            - the contents of a directory are a list of files of with name z.txt, where Z is a vertex of typeX 
+    *                                            - Each z.txt file comprises a list of strings of vertices of typeY that have a relation with vertexZ 
+    *                                            - i.e `FROM` Z `TO` [all lines (vertices) in Z.txt]
+    
+    *  4. _data/btrees/typeX/infofile.txt...     - stores all the properties in a file, one file per vertex
+    *                                            - Only category being updated in real-time thanks to b trees
+    *                                            - The rest will be written to when the program ends
     */
-    //each index denotes an edgeType corresponding to the same index in edgeTypeList
-    std::vector < std::pair < std::string, LL > > adjListArray;
 
-    void makeDir(std::string path, std::string newDirName) {
-        std::string command = "mkdir -p " + path + newDirName;
-        system(command.c_str());
-    }
+    /*
+    HELPER FUNCTIONS:
+    */
 
-    // Get the index of that TYPE of vertex. If it doesn't exist, put it in the list and return the index
-    int getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
-        int ans = vertexTypeList.findIndex(_vertexTypeLabel);
-        if (ans == -1) {
-            vertexTypeList.insert(_vertexTypeLabel);
-            //TODO: Init a new btree in the bTreeArray with name '_vertexTypeLabel'
-            makeDir("_ata/bTrees/", _vertexTypeLabel);
-            ans = vertexTypeList.getSize();
-        }
-        return ans;
-    }
+    // Get the index of that TYPE of {vertex,edge}. If it doesn't exist, put it in the relevant type
+    // list, push its entry into the {bTree,adjList}Array and return the final (newly added) index
+    int getIndexOfTypeOfVertex(std::string _vertexTypeLabel);
+    int getIndexOfTypeOfEdge(std::string label);
 
-    // Get the index of that TYPE of edge. If it doesn't exist, put it in the list and return the index
-    int getIndexOfTypeOfEdge(std::string label) {
-        int ans = edgeTypeList.findIndex(_edgeTypeLabel);
-        if (ans == -1) {
-            edgeTypeList.insert(_edgeTypeLabel);
-            //TODO: init a new adjList in adjListArray (make_pair<string, LL>())
-            //TODO: make a new directory _data/adjLists/'relation-typeX_typeY'/
-            makeDir("_data/adjLists/", newDir);
-            ans = edgeTypeList.getSize();
-        }
-        return ans;
-    }
+    // Write all the data structures to disk
+    void dumpGraphData();
 
-    void dumpGraphData() {
-
-        /* 
-
-        FILE STRUCTURE:
-
-        *  1. _data/vertexTypes.txt                  - just a sequential list of all the vertex types e.g typeX\ntypeY...
-
-        *  2. _data/edgeTypes.txt                    - just a sequential list of all the edge types, e.g Relation:typeX_typeY\ntypeA_typeB...
-
-        *  3. _data/adjLists/typeX_typeY/vertZ.txt   - Read edgeTypesList, where each entry denotes a directory
-        *                                            - where typeX is a name of a vertex type, and typeY is another vertex type
-        *                                            - the contents of each directory are as follows: a list of files of with name vertZ.txt, where vertZ is a vertex of typeX 
-        *                                            - Each vertZ.txt file comprises a list of strings of vertices of typeY that have a relation with vertexZ (FROM vertZ TO [vertices in vertZ.txt])
-        *                                            - the contents of a vertZ.txt file can then be passed to the LL constructor to deserialize it
- 
-        *  4. _data/btrees/typeX/infofile.txt...     - stores all the properties in a file, one file per vertex
-        *                                            - Only category being updated in real-time thanks to b trees
-        *                                            - The rest will be written to when the program ends
- 
-        */
-
-
-        // Write vertex and edge type lists blindly with LL::writeToFile()
-        vertexTypeList.writeToFile("data/vertexTypes.txt");
-        edgeTypeList.writeToFile("data/edgeTypes.txt");
-
-
-        // TODO: Figure out deserializing adjaceny lists...
-    }
-
+    // Used in merge()
     void updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties);
 
 public:
 
-    //basic ass constructor (mid)
-    graph();
-
-    //can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
-    //then for b trees, loop through vertex types and pass them as 'name' to btree file constructor. It'll handle the rest.
-    //TODO: Figure out serializing adjacency lists...
-    graph(int fileFlagCheck); 
+    // Constructors
+    graph();                  // default
+    graph(int fileCheckFlag); // file-based
 
     bool addVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
-
     bool addEdge (std::string _edgeTypeLabel, bool bidirectional,
                   std::string _vertex1ID, std::string _vertex2ID, 
                   std::string _vertex1Type, std::string _vertex2Type);
-
     void mergeVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
+
+    //TODO: Filter functions + Relational Queries
 
 };
 
-bool graph::addEdge (std::string _edgeTypeLabel, bool bidirectional,
-              std::string _vertex1ID, std::string _vertex2ID, 
-              std::string _vertex1Type, std::string _vertex2Type) {
+void graph::dumpGraphData() {
+    // Write vertex and edge type lists blindly with LL::writeToFile()
+    vertexTypeList.writeToFile("data/vertexTypes.txt");
+    edgeTypeList.writeToFile("data/edgeTypes.txt");
 
-    //first identify the TYPE of the edge from the edgeTypeList
-    int edgeType = getIndexOfTypeOfEdge(_edgeTypeLabel);
+    // Btrees get managed simultaneously by bTree class, so no need to write them here
 
-    //check what type of relation we have - in format "node1type_node2type"
-    std::string relationType = _vertex1Type + "_" + _vertex2Type;
+    // Write adjLists
+    // The appropriate directory structure is already created in the getIndexOfTypeOfEdge() function
+    // So we just need to write the infofile.txt and the z.txt files
+    std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
 
-    //TODO: Add the edge to adjListArray
-    //go through vertex1's adj. list element and append in vertex2
-    //if bidrectional, do the same for the other way around
+    //Loop through all the linked lists in the AdjListArray
+    for (int i = 0; i < edgeTypes.size(); i++) {
+
+        // Generate the directory path (one dir per edge type -> _data/adjLists/rel-typeX_typeY)
+        std::string dir = "data/adjLists/" + edgeTypes[i];
+
+        // Create the infofile.txt for each dir (holds all the filenames in the dir)
+        std::ofstream infofile(dir + "/infofile.txt");
+
+        // Loop through all the adjLists in the current LL to get the fromNodes, which we will use as filenames
+        for (Node<adjList>* curr = adjListArray[i].begin(); curr != nullptr; curr = curr->next) {
+
+            // Append these filenames to the infofile.txt
+            infofile << curr->data.fromNode << "\n";
+
+            // Write the `toNodes` to the file which has that `fromNode's` name 
+            curr->data.writeToPath(dir + "/" + curr->data.fromNode + ".txt");
+        }
+
+        infofile.close();
+    }
+}
+
+graph::graph() {
+    //can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
+    vertexTypeList = LL("data/vertexTypes.txt");
+    edgeTypeList = LL("data/edgeTypes.txt");
+
+    std::vector<std::string> vertexTypes = vertexTypeList.vecDump();
+    std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
+
+    //then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
+    for(std::string vertexType : vertexTypes) {
+        std::string dir = "data/bTrees/" + vertexType;
+        //TODO: remove comment when btreeArr finalized
+        /*
+        bTreeArray.push_back(bTree(dir, 0);)
+        */
+    }
+
+    //then for adjLists, loop through edge types (i.e loop through different relation directories)
+    for(std::string edgeType : edgeTypes) {
+        std::string dir = "data/adjLists/" + edgeType;
+        adjListArray.push_back(LinkedList<adjList>());
+        std::vector<std::string> fileNames = LL(dir + "/infofile.txt").vecDump();
+        // Then loop through every file in that directory and pass it to the adjList constructor
+        for(std::string fileName : fileNames) {
+            adjListArray.back().insert(adjList(fileName, LL(dir + "/" + fileName + ".txt")));
+        }
+    }
+}
+
+int graph::getIndexOfTypeOfEdge(std::string label) {
+    int ans = edgeTypeList.findIndex(label);
+    if (ans == -1) {
+        edgeTypeList.insert(label);
+        ans = edgeTypeList.getSize();
+        adjListArray.push_back(LinkedList<adjList>());
+        makeDir("_data/adjLists/", label);
+    }
+    return ans;
+}
+
+bool graph::addEdge (std::string relation, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
+
+    // label is brought to format "Relation-typeX_typeY"
+    std::string completeLabel = relation + "-" + _vertex1Type + "_" + _vertex2Type;
+
+    // first identify the TYPE of the edge from the edgeTypeList
+    int edgeType = getIndexOfTypeOfEdge(completeLabel);
+
+    // check if that vertex1's adj. list FROM element exists, 
+    adjList* adjListElement = &adjListArray[edgeType].find(adjList(_vertex1ID, LL()))->data;
+
+    // if it does, just append the new vertex2ID to it, else, create a new adjList element
+    if (adjListElement != nullptr)
+        adjListElement->toNodes.insert(_vertex2ID);
+    else
+        adjListArray[edgeType].insert(adjList(_vertex1ID, LL(_vertex2ID, 0)));
+
+    if (bidirectional)
+        addEdge(relation, false, _vertex2ID, _vertex1ID, _vertex2Type, _vertex1Type);
+
+    return true;
+}
+
+int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
+    int ans = vertexTypeList.findIndex(_vertexTypeLabel);
+    if (ans == -1) {
+        vertexTypeList.insert(_vertexTypeLabel);
+        //TODO: Init a new btree in the bTreeArray with name '_vertexTypeLabel'
+        makeDir("_data/bTrees/", _vertexTypeLabel);
+        ans = vertexTypeList.getSize();
+    }
+    return ans;
 }
 
 bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties) {
