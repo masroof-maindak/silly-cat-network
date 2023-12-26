@@ -1,3 +1,5 @@
+/* “An idiot admires complexity, a genius admires simplicity" ~ Terry Davis. */
+
 #ifndef GRAPH_H
 #define GRAPH_H
 
