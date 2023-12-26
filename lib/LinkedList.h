@@ -19,7 +19,7 @@ public:
     LinkedList(int _size); // create linked list of given size
     
     // Deep Copy
-    LinkedList(const LinkedList& L); // (Constructor)
+    LinkedList(const LinkedList& L); // Constructor
     LinkedList& operator=(const LinkedList & L);
 
     // Getters
@@ -55,6 +55,7 @@ public:
 //inherit string-only LinkedList class
 class LL: public LinkedList<std::string> {
 public:
+    //Reads a file and throws every string it finds into a LinkedList<string>
     LL(std::string filename) {
         std::ifstream file(filename);
         if (!file.is_open()) {
@@ -65,10 +66,13 @@ public:
         this->head = this->tail = nullptr;
         this->size = 0;
 
+        // ~ is a delimiter
         std::string line;
-        while (getline(file, line)) {
+        while (std::getline(file, line, '~')) {
             this->insert(line);
         }
+
+        file.close();
     }
 };
 
@@ -82,7 +86,7 @@ void LinkedList<T>::writeToFile(std::string filename) {
     }
 
     for(Node<T>* node = head; node != nullptr; node = node->next)
-        file << node->data << "\n";
+        file << node->data << "~";
 }
 
 //get index of a value
