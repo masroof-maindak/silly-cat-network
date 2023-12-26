@@ -66,9 +66,8 @@ public:
         this->head = this->tail = nullptr;
         this->size = 0;
 
-        // ~ is a delimiter
         std::string line;
-        while (std::getline(file, line, '~')) {
+        while (std::getline(file, line)) {
             this->insert(line);
         }
 
@@ -86,7 +85,9 @@ void LinkedList<T>::writeToFile(std::string filename) {
     }
 
     for(Node<T>* node = head; node != nullptr; node = node->next)
-        file << node->data << "~";
+        file << node->data << "\n";
+
+    file.close();
 }
 
 //get index of a value
