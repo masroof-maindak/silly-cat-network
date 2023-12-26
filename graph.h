@@ -40,6 +40,7 @@ private:
 
     /*
     FILE STRUCTURE:
+
     *  1. _data/vertexTypes.txt                  - just a sequential list of all the vertex types e.g typeX\ntypeY...
     
     *  2. _data/edgeTypes.txt                    - just a sequential list of all the edge types, e.g Relation:typeX_typeY\ntypeA_typeB...
@@ -53,10 +54,13 @@ private:
     *  4. _data/btrees/typeX/infofile.txt...     - stores all the properties in a file, one file per vertex
     *                                            - Only category being updated in real-time thanks to b trees
     *                                            - The rest will be written to when the program ends
+    
+    *  5. _data/vertexProperties/uniqueKey.txt   - stores all the properties in a file, one file per vertex
+    *                                            - in this format: "key1:value1~key2:value2~...keyN:valueN~"
     */
 
     /*
-    HELPER FUNCTIONS:
+    PRIVATE HELPER FUNCTIONS:
     */
 
     // Get the index of that TYPE of {vertex,edge}. If it doesn't exist, put it in the relevant type
@@ -219,8 +223,7 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
 
     //_vertexProperties is in form: "key1:value1~key2:value2~...keyN:valueN~"
 
-    std::string writePath;
-    //TODO: Get proper path
+    std::string writePath = "_data/vertexProperties/" + uniqueKey + ".bin";
     std::ofstream file(writePath, std::ios::binary);
     file.write((char*)_vertexProperties.size(), sizeof(int));
     file.write(_vertexProperties.c_str(), _vertexProperties.size());
@@ -232,8 +235,7 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
 void graph::updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties) {
     
     //first read info from file
-    std::string readPath;
-    //TODO: Get proper path
+    std::string readPath = "_data/vertexProperties/" + uniqueKey + ".bin";
     std::ifstream file(readPath, std::ios::binary);
     
     // Read int size to get string size
@@ -289,7 +291,6 @@ void graph::updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, st
     file2.write((char*)properties.size(), sizeof(int));
     file2.write(properties.c_str(), properties.size());
     file2.close();
-
 }
 
 void graph::mergeVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties) {
