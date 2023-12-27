@@ -10,7 +10,7 @@
 #include "lib/encryption.h"
 #include <unordered_map>
 #include <sstream>
-// #include "lib/bTree.h"
+#include "lib/bTree.h"
 
 // Note: LL = LinkedList<std::string>
 
@@ -142,7 +142,7 @@ graph::graph(int fileCheckFlag) {
     //then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
     for(std::string vertexType : vertexTypes) {
         std::string dir = "data/bTrees/" + vertexType;
-        bTreeArray.push_back(bTree(dir, 0);
+        bTreeArray.push_back(bTree(dir, 0));
     }
 
     //then for adjLists, loop through edge types (i.e loop through different relation directories)
@@ -194,7 +194,7 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
     int ans = vertexTypeList.findIndex(_vertexTypeLabel);
     if (ans == -1) {
         vertexTypeList.insert(_vertexTypeLabel);
-        bTreeArray.push_back(bTree(_vertexTypeLabel);
+        bTreeArray.push_back(bTree(_vertexTypeLabel));
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize();
     }
