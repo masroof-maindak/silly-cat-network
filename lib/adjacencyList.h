@@ -20,7 +20,8 @@ struct adjList {
         toNodes.writeToFile(filename);
     }
 
-    bool operator==(const adjList& other) const {
+    // Used to check the existence of an adjList within a certain LL of a relation
+    bool operator==(const adjList& other) const { 
         return fromNode == other.fromNode;
     }
 };

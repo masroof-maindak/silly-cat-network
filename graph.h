@@ -196,7 +196,7 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
     if (ans == -1) {
         vertexTypeList.insert(_vertexTypeLabel);
         //TODO: Remove comment when btreeArr finalized
-        // bTreeArray.push_back(bTree(_vertexTypeLabel, 0));
+        // bTreeArray.push_back(bTree(_vertexTypeLabel);
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize();
     }
@@ -208,17 +208,12 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
     // Identify the TYPE of the vertex from the vertexTypeList
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
-    bool exists = true;
-
     // Search in B tree array at vertexType-th index and check if that vertex exists already
     //TODO: remove comment when btreeArr finalized
     /*
-    if (bTreeArray[vertexType].search(uniqueKey) == false)
-        exists = false
-    */
-
-    if (exists)
+    if (bTreeArray[vertexType].search(uniqueKey) == -1)
         return false;
+    */
 
     //TODO: remove comment when btreeArr finalized
     //bTreeArray[vertexType].insert(uniqueKey);
@@ -311,19 +306,14 @@ void graph::mergeVertex(std::string uniqueKey, std::string _vertexTypeLabel, std
 
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
-    bool exists = true;
-
     // Search in B tree array at vertexType-th index and check if that vertex exists already
     //TODO: remove comment when btreeArr finalized
     /*
-    if (bTreeArray[vertexType].search(uniqueKey) == nullptr)
-        exists = false
-    */
-
-    if (!exists)
+    if (bTreeArray[vertexType].search(uniqueKey) == -1)
         addVertex (uniqueKey, _vertexTypeLabel, _vertexProperties);
     else
-        updateVertex(uniqueKey, _vertexTypeLabel, _vertexProperties);
+        updateVertex (uniqueKey, _vertexTypeLabel, _vertexProperties);
+    */
 }
 
 #endif //GRAPH_H
