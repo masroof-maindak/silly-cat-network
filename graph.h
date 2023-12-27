@@ -29,8 +29,7 @@ private:
     // 1.
     // An array of b trees, each index of the array denotes a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices of that vertex type
-    //TODO: remove comment when btreeArr finalized
-    // std::vector<bTree> bTreeArray;
+    std::vector<bTree> bTreeArray;
     
     // 2/3.
     // list of all the vertex/edge types - this will be kept in memory and read/written to disk at program start/end
@@ -143,10 +142,7 @@ graph::graph(int fileCheckFlag) {
     //then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
     for(std::string vertexType : vertexTypes) {
         std::string dir = "data/bTrees/" + vertexType;
-        //TODO: remove comment when btreeArr finalized
-        /*
-        bTreeArray.push_back(bTree(dir, 0);)
-        */
+        bTreeArray.push_back(bTree(dir, 0);
     }
 
     //then for adjLists, loop through edge types (i.e loop through different relation directories)
@@ -198,8 +194,7 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
     int ans = vertexTypeList.findIndex(_vertexTypeLabel);
     if (ans == -1) {
         vertexTypeList.insert(_vertexTypeLabel);
-        //TODO: Remove comment when btreeArr finalized
-        // bTreeArray.push_back(bTree(_vertexTypeLabel);
+        bTreeArray.push_back(bTree(_vertexTypeLabel);
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize();
     }
@@ -212,14 +207,10 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
     // Search in B tree array at vertexType-th index and check if that vertex exists already
-    //TODO: remove comment when btreeArr finalized
-    /*
     if (bTreeArray[vertexType].search(uniqueKey) == -1)
         return false;
-    */
 
-    //TODO: remove comment when btreeArr finalized
-    //bTreeArray[vertexType].insert(uniqueKey);
+    bTreeArray[vertexType].insert(uniqueKey);
 
     //_vertexProperties is in form: "key1:value1~key2:value2~...keyN:valueN~"
     std::string writePath = "_data/vertexProperties/" + uniqueKey + ".bin";
@@ -330,13 +321,10 @@ void graph::mergeVertex(std::string uniqueKey, std::string _vertexTypeLabel, std
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
     // Search in B tree array at vertexType-th index and check if that vertex exists already
-    //TODO: remove comment when btreeArr finalized
-    /*
     if (bTreeArray[vertexType].search(uniqueKey) == -1)
         addVertex (uniqueKey, _vertexTypeLabel, _vertexProperties);
     else
         updateVertex (uniqueKey, _vertexTypeLabel, _vertexProperties);
-    */
 }
 
 #endif //GRAPH_H
