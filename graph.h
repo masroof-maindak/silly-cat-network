@@ -228,7 +228,7 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
     std::ofstream file(writePath, std::ios::binary);
     
     //scan string for a value that starts with '!', replace it with its output after badHasher()
-    checkStringForEncryptables(_vertexProperties);
+    checkStringForEncryptables(_vertexProperties, 0);
     
     //write string size
     file.write((char*)_vertexProperties.size(), sizeof(int));
