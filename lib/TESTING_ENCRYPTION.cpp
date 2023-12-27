@@ -4,7 +4,7 @@
 int main() {
     std::string test = "username:freegoblinpics~!password:evilpass~";
 
-    checkStringForEncryptables(test);
+    checkStringForEncryptables(test, 0);
 
     std::cout << test;
 
