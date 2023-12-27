@@ -26,7 +26,7 @@ private:
     CORE DATA STRUCTURES:
     */
 
-    // 1. 
+    // 1.
     // An array of b trees, each index of the array denotes a btree that corresponds to the index of that vertex type in the vertexTypeList
     // Each b tree holds only the unique identifiers of all graph vertices of that vertex type
     //TODO: remove comment when btreeArr finalized

@@ -13,20 +13,35 @@ void reverseBadHashing (std::string& key) {
         key[i] -= adder[i % 8];
 }
 
+void replaceEncryptedValue(std::string& original, const std::string& fromSubstr, const std::string& toSubstr) {
+    size_t start_pos = original.find(fromSubstr);
+    if (start_pos == std::string::npos)
+        return;
+    original.replace(start_pos, fromSubstr.length(), toSubstr);
+}
+
 void checkStringForEncryptables (std::string& vertexProperties, bool isDehash) {
+    //put string into stream
     std::istringstream iss(vertexProperties);
-    std::string token, key, value;
-    while (std::getline(iss, token, '~')) {
-        if (std::istringstream(token) >> key >> token >> value && token == ":") {
-            if (!value.empty() && key[0] == '!') {
-                if (!isDehash)
-                    badHasher(value);
-                else
-                    reverseBadHashing(value);
-                size_t pos = vertexProperties.find(key + ":" + value);
-                if (pos != std::string::npos)
-                    vertexProperties.replace(pos + key.length() + 1, value.length(), value);
-            }
-        }
+    std::string keyValuePair;
+
+    //iterate through stream, delimiting by ~
+    while (std::getline(iss, keyValuePair, '~')) {
+
+        //separate keyValuePairs into key and value strings
+        std::istringstream iss2(keyValuePair);
+        std::string key, value;
+        std::getline(iss2, key, ':');
+        std::getline(iss2, value, ':');
+
+        //if first character of key is a !, then encrypt/decrypt corresponding value
+        if (key[0] == '!')
+            if (isDehash)
+                reverseBadHashing(value);
+            else
+                badHasher(value);
+        
+        //replace keyValuePair with new value
+        replaceEncryptedValue(vertexProperties, keyValuePair, key + ":" + value);
     }
 }
