@@ -78,6 +78,9 @@ private:
     // Used in merge()
     void updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties);
 
+    // For returning data to user
+    std::string fetchProperties(std::string uniqueKey, std::string _vertexTypeLabel);
+
 public:
 
     // Constructors
@@ -233,6 +236,26 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
     file.close();
 
     return true;
+}
+
+std::string graph::fetchProperties (std::string uniqueKey, std::string _vertexTypeLabel) {
+    //This function assumes that the vertex exists, and is called only after checking that it does
+    std::ifstream file("_data/vertexProperties/" + uniqueKey + ".bin", std::ios::binary);
+
+    //read string size
+    int fileSize;
+    file.read((char*)&fileSize, sizeof(int));
+
+    //read string contents
+    std::string properties; properties.resize(fileSize);
+    file.read(&properties[0], fileSize);
+
+    //decrypt data if needed
+    checkStringForEncryptables(properties, 1);
+
+    //return string
+    file.close();
+    return properties;
 }
 
 void graph::updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties) {
