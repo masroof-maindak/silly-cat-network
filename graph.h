@@ -7,6 +7,7 @@
 #include <vector>
 #include "lib/LinkedList.h"
 #include "lib/adjacencyList.h"
+#include "lib/encryption.h"
 #include <unordered_map>
 #include <sstream>
 // #include "lib/bTree.h"
@@ -59,7 +60,7 @@ private:
     *                                            - The rest will be written to when the program ends
     
     *  5. _data/vertexProperties/uniqueKey.txt   - stores all the properties in a file, one file per vertex
-    *                                            - in this format: "key1:value1~key2:value2~...keyN:valueN~"
+    *                                            - in this format: "{stringSize}key1:value1~key2:value2~...~keyN:valueN~"
     */
 
     /*
@@ -128,7 +129,7 @@ void graph::dumpGraphData() {
     }
 }
 
-graph::graph() {
+graph::graph(int fileCheckFlag) {
     //can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
     vertexTypeList = LL("data/vertexTypes.txt");
     edgeTypeList = LL("data/edgeTypes.txt");
@@ -151,9 +152,8 @@ graph::graph() {
         adjListArray.push_back(LinkedList<adjList>());
         std::vector<std::string> fileNames = LL(dir + "/infofile.txt").vecDump();
         // Then loop through every file in that directory and pass it to the adjList constructor
-        for(std::string fileName : fileNames) {
+        for(std::string fileName : fileNames)
             adjListArray.back().insert(adjList(fileName, LL(dir + "/" + fileName + ".txt")));
-        }
     }
 }
 
@@ -224,10 +224,16 @@ bool graph::addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std:
     //bTreeArray[vertexType].insert(uniqueKey);
 
     //_vertexProperties is in form: "key1:value1~key2:value2~...keyN:valueN~"
-
     std::string writePath = "_data/vertexProperties/" + uniqueKey + ".bin";
     std::ofstream file(writePath, std::ios::binary);
+    
+    //scan string for a value that starts with '!', replace it with its output after badHasher()
+    checkStringForEncryptables(_vertexProperties);
+    
+    //write string size
     file.write((char*)_vertexProperties.size(), sizeof(int));
+
+    //write properties string
     file.write(_vertexProperties.c_str(), _vertexProperties.size());
     file.close();
 
@@ -274,6 +280,12 @@ void graph::updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, st
         std::stringstream ss4(keyValueString);
         std::getline(ss4, key, ':');
         std::getline(ss4, value, ':');
+
+        //if such a 'value' exists that is prepended by '!', 
+        //pass it through the hasher to encrypt it before writing
+        if (key[0] == '!') //e.g !password
+            badHasher(value);
+
         newPropertiesMap[key] = value;
     }
 
