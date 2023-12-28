@@ -1,6 +1,7 @@
 #include <iostream>
 #include "graph.h"
 #include "lib/queue.h"
+#include <cstring>       //memset
 
 #include <unistd.h>      //socket-handling + system-level operations
 #include <sys/socket.h>  //for sockets
@@ -14,6 +15,8 @@
 #include <chrono>        //answer queue pops un-picked-up answer
 
 #define SLEEP_TIME 690000 //0.69s
+#define MAX_CLIENTS 5
+#define BUFFER_SIZE 512
 
 struct answer {
     int transactionID;
@@ -27,28 +30,35 @@ Queue<answer> answerQueue;              // stores generated answers, and pops th
 void* decider(void* clientSocketPtr) {
     int clientSocket = *((int*)(&clientSocketPtr));
     free(clientSocketPtr);
+    std::ofstream logger("_data/logs.txt", std::ios::app);
 
-    //first recieve the size of the string
-    int size;
-    if (recv(clientSocket, &size, sizeof(int), 0) == -1)
-        perror("Failed to receive size"); return NULL;
+    // Recieve string in a char buffer, and trim it down to length afterwards
+    char buffer[BUFFER_SIZE]; 
+    std::memset(buffer, 0, BUFFER_SIZE);
+    int bytesReceived = recv(clientSocket, buffer, BUFFER_SIZE, 0);
+    if (bytesReceived == -1) {
+        perror("Failed to recieve message"); return NULL;
+    } else if (bytesReceived == 0) {
+        std::cout << "Client disconnected" << std::endl; return NULL;
+    }
 
-    //then recieve the string itself
-    std::string query; query.resize(size);
-    if (recv(clientSocket, &query, sizeof(query), 0) == -1)
-        perror("Failed to receive query"); return NULL;
+    //trimming query down to length and logging it
+    std::string query = std::string(buffer, bytesReceived);
+    logger << time(0) << " | REQUEST: " << query << "\n";
 
-    //Now parse the query and call graph functions accordingly:
+    //Now, to parse the query and call graph functions accordingly:
 
     //first word of query is the transaction ID
     int transactionID = std::stoi(query.substr(0, query.find(" ")));
-    query.erase(0, query.find(" ") + 1);
+    query = query.substr(query.find(" ") + 1);
 
-    //second word of query is the function to be called
-    std::string function = query.substr(0, query.find(" "));
-    query.erase(0, query.find(" ") + 1);
+    std::string functionToCall = query.substr(0, query.find(" "));
+    query = query.substr(query.find(" ") + 1);
 
-    //TODO: Make enum for functions
+    //remove transaction ID and function name from query
+
+    //TODO: Make enum for functions based on functionToCall
+
     /*
     switch (query) {
 
@@ -67,19 +77,17 @@ void* decider(void* clientSocketPtr) {
                 feedback = temp.retMessage;
                 break;
             }
-        } else {
+        } else
             usleep(SLEEP_TIME); 
-        }
     }
 
     //send answer to client and log it
-    std::ofstream logger("_data/logs.txt", std::ios::app);
-
     if (send(clientSocket, &feedback, sizeof(feedback), 0) == -1) {
         perror("Failed to send answer"); return NULL;
-    } else {
-        logger << time(0) << " " << feedback << "\n";
-    }
+        logger << time(0) << " | REPORT: " << "Failed to send answer, transaction #" << transactionID << "\n";
+    } 
+    else
+        logger << time(0) << " | REPORT: " << feedback << "\n";
 
     //close file, client socket and thread
     logger.close();
@@ -111,10 +119,10 @@ void* readAnswerQueue(void* arg) {
                         break;
                     }
 
-                    // Sleep for a short duration to avoid busy-waitings
+                    // sleep for some time
                     struct timespec sleepTime;
                     sleepTime.tv_sec = 0;
-                    sleepTime.tv_nsec = 100000000; //100 ms
+                    sleepTime.tv_nsec = 200000000; //200 ms
                     nanosleep(&sleepTime, NULL);
                 }
             }
@@ -124,9 +132,8 @@ void* readAnswerQueue(void* arg) {
                 answerQueue.pop();
                 std::cout << "Popped value: " << currAns << "; Client might have disconnected" << std::endl;
             }
-        } else {
+        } else
             usleep(SLEEP_TIME);
-        }
     }
     return NULL;
 }
@@ -136,9 +143,8 @@ int main() {
     //create the thread that handles the answer queue
     pthread_t answerThread; //pops if the top of the queue remains unchanged for a fixed time period
     //e.g when the client disconnects
-    if (pthread_create(&answerThread, NULL, readAnswerQueue, NULL) != 0) {
+    if (pthread_create(&answerThread, NULL, readAnswerQueue, NULL) != 0)
         perror("Answer thread creation failed"); return 1;
-    }
 
     //PTHREAD_CREATE() arguments:
     //1. thread by reference
@@ -148,9 +154,8 @@ int main() {
 
     //big daddy server socket
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocket == -1) {
+    if (serverSocket == -1)
         perror("Socket creation failed"); return 1;
-    }
 
     //SOCKET() arguments:
     //af_inet = address family (ipv4) - others include AF_INET6 (ipv6), AF_UNIX (IPC comm. on the same device)
@@ -159,9 +164,8 @@ int main() {
 
     //make it so that it overwrites a previous iteration's binding to the same port
     int reuse = 1;
-    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1)
         perror("setsockopt"); return 1;
-    }
 
     //bind the socket to an IP address, port and network protocol
     struct sockaddr_in serverAddr;
@@ -176,14 +180,12 @@ int main() {
 	// s_addr is used to store the actual IP address in binary format.
 
     //bind - associates socket with specific network address (IP + port)
-    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1)
         perror("Binding failed"); return 1;
-    }
 
     //listen for incoming connections
-    if (listen(serverSocket, 5) == -1) {
+    if (listen(serverSocket, 5) == -1)
         perror("Listening failed"); return 1;
-    }
 
     //LISTEN() arguments:
     //1. make this socket ready to accept connections

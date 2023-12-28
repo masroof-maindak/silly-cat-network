@@ -163,15 +163,13 @@ bool graph::removeEdge(std::string relation, bool bidirectional, std::string _ve
 
 bool graph::removeVertex(std::string uniqueKey, std::string _vertexTypeLabel) {
 
-    //remove from btree
     int vertexType = vertexTypeList.findIndex(_vertexTypeLabel);
-
-    if (vertexType == -1) //if vertex type doesn't exist, what are we supposed to be removing?
+    if (vertexType == -1) // If vertex type doesn't exist, what are we supposed to be removing?
         return false;
 
-    //if removal successfull
+    // If removal from btree successful
     if (bTreeArray[vertexType].erase(uniqueKey)) {
-        //remove properties file
+        // Delete the properties file
         std::string filepath = "_data/vertexProperties/" + uniqueKey + ".bin";
         std::remove(filepath.c_str());
         return true;
@@ -189,21 +187,21 @@ void graph::dumpGraphData() {
 }
 
 graph::graph(int fileCheckFlag) {
-    // can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
+    // Can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
     vertexTypeList = LL("data/vertexTypes.txt");
     edgeTypeList = LL("data/edgeTypes.txt");
 
     std::vector<std::string> vertexTypes = vertexTypeList.vecDump();
     std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
 
-    // then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
-    // the btree class will handle the rest
+    // Then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
+    // The btree class will handle the rest
     for(std::string vertexType : vertexTypes) {
         std::string dir = "data/bTrees/" + vertexType;
         bTreeArray.push_back(bTree(dir, 0));
     }
 
-    // no need to do anything for adj lists, they will be created/read/modified on the fly
+    // No need to do anything for adj lists, they will be created/read/modified on the fly
 }
 
 int graph::getIndexOfTypeOfEdge(std::string label) {
@@ -412,17 +410,15 @@ void graph::updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, st
     }
 
     // Go through through newProperties and update oldProperties
-    for (auto it = newPropertiesMap.begin(); it != newPropertiesMap.end(); it++) {
+    for (auto it = newPropertiesMap.begin(); it != newPropertiesMap.end(); it++)
         oldPropertiesMap[it->first] = it->second;
-    }
 
     // Coalesce hashmap into a string
     std::string properties;
-    for (auto it = oldPropertiesMap.begin(); it != oldPropertiesMap.end(); it++) {
+    for (auto it = oldPropertiesMap.begin(); it != oldPropertiesMap.end(); it++)
         properties += it->first + ":" + it->second + "~";
-    }
 
-    // Write the string to the file
+    // Write the updated string back to the file
     std::ofstream file2(readPath, std::ios::binary);
     file2.write((char*)properties.size(), sizeof(int));
     file2.write(properties.c_str(), properties.size());
