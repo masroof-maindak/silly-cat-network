@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "Node.h"
 
 template <class T>
@@ -62,8 +63,10 @@ public:
     LL(std::string filename) {
         std::ifstream file(filename);
         if (!file.is_open()) {
-            std::cout << "File to deserialize LL<string> from not found." << std::endl;
-            return;
+            std::cout << "File to deserialize LL, " << filename << "not found." << std::endl;
+            this->head = this->tail = nullptr;
+            this->size = 0;
+            return;            
         }
 
         this->head = this->tail = nullptr;

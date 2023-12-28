@@ -1,3 +1,6 @@
+//I'm pretty sure this is junk now but I'm keeping it around just for backup purposes.
+
+/*
 #include <string>
 #include "LinkedList.h"
 
@@ -25,3 +28,4 @@ struct adjList {
         return fromNode == other.fromNode;
     }
 };
+*/

@@ -10,7 +10,6 @@
 
 #include "lib/bTree.h"
 #include "lib/LinkedList.h"
-#include "lib/adjacencyList.h"
 #include "lib/encryption.h"
 
 // Note: LL = LinkedList<std::string>
@@ -36,11 +35,6 @@ private:
     // list of all the vertex/edge types - this will be kept in memory and read/written to disk at program start/end
     LL vertexTypeList;
     LL edgeTypeList;
-
-    // 4.
-    // vector of linked list of AdjList
-    // Each index holds a set of adjLists that correspond to the index of that edge type in the edgeTypeList
-    std::vector<LinkedList<adjList>> adjListArray;
 
     /*
     FILE STRUCTURE:
@@ -70,7 +64,7 @@ private:
     */
 
     // Get the index of that TYPE of {vertex,edge}. If it doesn't exist, put it in the relevant type
-    // list, push its entry into the {bTree,adjList}Array and return the final (newly added) index
+    // list, push its entry into {bTreeArray,adjList/[edgetype]/} and return the final (newly added) index
     int getIndexOfTypeOfVertex(std::string _vertexTypeLabel);
     int getIndexOfTypeOfEdge(std::string label);
 
@@ -100,64 +94,29 @@ public:
 };
 
 void graph::dumpGraphData() {
-    // Write vertex and edge type lists blindly with LL::writeToFile()
+    // Write vertex and edge type lists unconditionally with LL::writeToFile()
     vertexTypeList.writeToFile("data/vertexTypes.txt");
     edgeTypeList.writeToFile("data/edgeTypes.txt");
-
     // Btrees get managed in real time by the bTree class, so no need to write them here
-
-    // Write adjLists
-    // The appropriate directory structure is already created in the getIndexOfTypeOfEdge() function
-    // So we just need to write the infofile.txt and the z.txt files
-
-    std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
-
-    //Loop through all the linked lists in the AdjListArray
-    for (int i = 0; i < edgeTypes.size(); i++) {
-
-        // Generate the directory path (one dir per edge type -> e.g `_data/adjLists/rel-typeX_typeY/`)
-        std::string dir = "data/adjLists/" + edgeTypes[i];
-
-        // Create the infofile.txt for each dir (holds all the filenames in the dir)
-        std::ofstream infofile(dir + "/infofile.txt");
-
-        // Loop through all the adjLists in the current LL to get the 'fromNodes', which we will use as filenames
-        for (Node<adjList>* curr = adjListArray[i].begin(); curr != nullptr; curr = curr->next) {
-
-            // Append these filenames to the infofile.txt
-            infofile << curr->data.fromNode << "\n";
-
-            // Write the `toNodes` to the file which has that `fromNode's` name 
-            curr->data.writeToPath(dir + "/" + curr->data.fromNode + ".txt");
-        }
-
-        infofile.close();
-    }
+    // Adj lists get managed in real time by whatever function accesses them, so no need to write them here
 }
 
 graph::graph(int fileCheckFlag) {
-    //can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
+    // can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
     vertexTypeList = LL("data/vertexTypes.txt");
     edgeTypeList = LL("data/edgeTypes.txt");
 
     std::vector<std::string> vertexTypes = vertexTypeList.vecDump();
     std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
 
-    //then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
+    // then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
+    // the btree class will handle the rest
     for(std::string vertexType : vertexTypes) {
         std::string dir = "data/bTrees/" + vertexType;
         bTreeArray.push_back(bTree(dir, 0));
     }
 
-    //then for adjLists, loop through edge types (i.e loop through different relation directories)
-    for(std::string edgeType : edgeTypes) {
-        std::string dir = "data/adjLists/" + edgeType;
-        adjListArray.push_back(LinkedList<adjList>());
-        std::vector<std::string> fileNames = LL(dir + "/infofile.txt").vecDump();
-        // Then loop through every file in that directory and pass it to the adjList constructor
-        for(std::string fileName : fileNames)
-            adjListArray.back().insert(adjList(fileName, LL(dir + "/" + fileName + ".txt")));
-    }
+    // no need to do anything for adj lists, they will be created/read/modified on the fly
 }
 
 int graph::getIndexOfTypeOfEdge(std::string label) {
@@ -165,7 +124,6 @@ int graph::getIndexOfTypeOfEdge(std::string label) {
     if (ans == -1) {
         edgeTypeList.insert(label);
         ans = edgeTypeList.getSize();
-        adjListArray.push_back(LinkedList<adjList>());
         makeDir("_data/adjLists/", label);
     }
     return ans;
@@ -173,23 +131,87 @@ int graph::getIndexOfTypeOfEdge(std::string label) {
 
 bool graph::addEdge (std::string relation, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
 
+    // Check if vertex1 and vertex2 exist in our bTrees
+    int vertex1Type = getIndexOfTypeOfVertex(_vertex1Type);
+    int vertex2Type = getIndexOfTypeOfVertex(_vertex2Type);
+
+    if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1)
+        return false;
+
     // label is brought to format "Relation-typeX_typeY"
     std::string completeLabel = relation + "-" + _vertex1Type + "_" + _vertex2Type;
 
-    // first identify the TYPE of the edge from the edgeTypeList
+    // first identify the TYPE of the edge from the edgeTypeList, this will also make the directory for that edge if it doesn't exist
     int edgeType = getIndexOfTypeOfEdge(completeLabel);
 
-    // check if that vertex1's adj. list FROM element exists, 
-    adjList* adjListElement = &adjListArray[edgeType].find(adjList(_vertex1ID, LL()))->data;
+    //go to that directory's infofile.txt and check if the vertex1ID exists in it
+    //i.e if there is an adjList element where fromNode is vertex1ID
+    std::string dir = "_data/adjLists/" + completeLabel + "/";
+    LL info(dir + "infofile.txt");
 
-    // if it does, just append the new vertex2ID to it, else, create a new adjList element
-    if (adjListElement != nullptr)
-        adjListElement->toNodes.insert(_vertex2ID);
-    else
-        adjListArray[edgeType].insert(adjList(_vertex1ID, LL(_vertex2ID, 0)));
+    bool vertex1Exists = info.findIndex(_vertex1ID) != -1;
+    bool vertex2Exists = info.findIndex(_vertex2ID) != -1;
 
-    if (bidirectional)
-        addEdge(relation, false, _vertex2ID, _vertex1ID, _vertex2Type, _vertex1Type);
+    // if vertex1ID doesn't exist in the infofile.txt, create a new file for it and add vertex2ID to it
+    if (!vertex1Exists) {
+
+        //create a new file for vertex1ID
+        std::ofstream file(dir + _vertex1ID + ".txt");
+        
+        //add vertex2ID to it
+        file << _vertex2ID << "\n";
+        file.close();
+        
+        //add vertex1ID to info LL
+        info.insert(_vertex1ID);
+
+    } else {
+        //open the file for vertex1ID
+        LL vertex1AdjList(dir + _vertex1ID + ".txt");
+
+        //if vertex2ID already exists in vertex1's adjList, return false
+        if (vertex1AdjList.findIndex(_vertex2ID) != -1)
+            return false;
+
+        //else insert it
+        else {
+            vertex1AdjList.insert(_vertex2ID);
+
+            // and write changes to disk
+            vertex1AdjList.writeToFile(dir + _vertex1ID + ".txt");
+        }
+    }
+
+    if (bidirectional) {
+        //we've already guaranteed that vertex1 and vertex2 are real.
+        //and if the relation is bidrectional, it's almost certain that vertex1ID won't exist in vertex2ID's adjList
+        //so we can just append vertex1ID to vertex2ID's adjList without checking
+
+        if (!vertex2Exists) {
+            //insert it in info file
+            info.insert(_vertex2ID);
+
+            //create a new file for vertex2ID
+            std::ofstream file(dir + _vertex2ID + ".txt");
+
+            //add vertex1ID to it
+            file << _vertex1ID << "\n";
+            file.close();
+
+        } else {
+            //open the file for vertex2ID
+            LL vertex2AdjList(dir + _vertex2ID + ".txt");
+
+            //insert vertex1ID
+            vertex2AdjList.insert(_vertex1ID);
+
+            // and write changes to disk
+            vertex2AdjList.writeToFile(dir + _vertex2ID + ".txt");
+        }
+    }
+    
+    //update info file
+    info.writeToFile(dir + "infofile.txt");
 
     return true;
 }
