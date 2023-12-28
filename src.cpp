@@ -21,6 +21,8 @@ Queue<answer> answerQueue;              // stores generated answers, and pops th
 
 #include "graph.h"
 
+graph g(0); //globally accessible graph object
+
 #define SLEEP_TIME 690000 //0.69s
 #define MAX_CLIENTS 5
 #define BUFFER_SIZE 512
@@ -71,17 +73,38 @@ void* decider(void* clientSocketPtr) {
 
     if (functionToCall == "addVertex") {
 
+        //arguments: transactionID, vertexID, vertexType, vertexProperties
+        g.addVertex(transactionID, arguments[0], arguments[1], arguments[2]);
+
     } else if (functionToCall == "addEdge") {
+
+        //arguments: transactionID, edgeTypeLabel, bidirectional, vertex1ID, vertex2ID, vertex1Type, vertex2Type
+        g.addEdge(transactionID, arguments[0], stoi(arguments[1]), arguments[2], arguments[3], arguments[4], arguments[5]);
 
     } else if (functionToCall == "mergeVertex") {
 
+        //arguments: transactionID, vertexID, vertexType, vertexProperties
+        g.mergeVertex(transactionID, arguments[0], arguments[1], arguments[2]);
+
     } else if (functionToCall == "removeVertex") {
+
+        //arguments: transactionID, vertexID, vertexType
+        g.removeVertex(transactionID, arguments[0], arguments[1]);
 
     } else if (functionToCall == "removeEdge") {
 
+        //arguments: transactionID, edgeTypeLabel, bidirectional, vertex1ID, vertex2ID, vertex1Type, vertex2Type
+        g.removeEdge(transactionID, arguments[0], stoi(arguments[1]), arguments[2], arguments[3], arguments[4], arguments[5]);
+
     } else if (functionToCall == "filter") {
 
+        //arguments: transactionID, vertexType, vertexProperties
+        g.filter(transactionID, arguments[0], arguments[1]);
+
     } else if (functionToCall == "relationalQuery") {
+
+        //arguments: transactionID, vertex1ID, vertex1Type, vertex2Type, edgeTypeLabel, properties
+        g.relationalQuery(transactionID, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
 
     } else {
         std::cout << "Invalid function name" << std::endl;
