@@ -12,8 +12,6 @@
 #include "lib/LinkedList.h"
 #include "lib/encryption.h"
 
-
-
 void makeDir(std::string path, std::string newDirName) {
     std::string command = "mkdir -p " + path + newDirName;
     system(command.c_str());
@@ -74,14 +72,14 @@ private:
     // Used in merge()
     void updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties);
 
-    // For returning data to user
+    // For returning data to user, going to use this in filtering probably?
     std::string fetchProperties(std::string uniqueKey, std::string _vertexTypeLabel);
 
 public:
 
     // Constructors
-    graph();                  // default
-    graph(int fileCheckFlag); // file-based
+    graph() {}                // default - does nothing really
+    graph(int fileCheckFlag); // file-based - inits graph from files
 
     bool addVertex (std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
     bool addEdge (std::string _edgeTypeLabel, bool bidirectional,
@@ -98,10 +96,10 @@ public:
     TODO:
     *   filtering
     *   relational queries
-    **  Refactor other functions to push their reports to answerQueue as well as the file they're working on to the filesBeingProcessedQueue, and pop them when done
-    **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue
+    **  Refactor functions to push report/answer to answerQueue as well as the file they're working on to the filesBeingProcessedQueue, and pop them when done
+    **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue (include a while loop that checks if the file is in the queue, if it is, sleep for 0.4s)
     *   Application backend (is client + generates perfect commands) + frontend
-    */  
+    */
 
 };
 
@@ -418,7 +416,7 @@ void graph::updateVertex(std::string uniqueKey, std::string _vertexTypeLabel, st
     for (auto it = oldPropertiesMap.begin(); it != oldPropertiesMap.end(); it++)
         properties += it->first + ":" + it->second + "~";
 
-    // Write the updated string back to the file
+    // Write the string to the file
     std::ofstream file2(readPath, std::ios::binary);
     file2.write((char*)properties.size(), sizeof(int));
     file2.write(properties.c_str(), properties.size());
