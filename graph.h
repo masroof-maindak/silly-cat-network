@@ -78,7 +78,7 @@ private:
     std::string fetchProperties(std::string uniqueKey, std::string _vertexTypeLabel);
 
     // writes info to logs and returns to client
-    void communicate ();
+    void communicate (std::string report);
 
 public:
 
@@ -95,7 +95,15 @@ public:
     bool removeEdge(std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID);
     bool removeVertex(std::string uniqueKey, std::string _vertexTypeLabel);
 
-    //TODO: Filter functions + Relational Queries + communicate
+    /*
+    TODO:
+    *   Implement removeEdge()
+    *   filtering
+    *   relational queries
+    *   convert to server
+    **  Refactor other functions to send reports to communicate() via global queue maybe?
+    *   Application backend (is client + generates perfect commands) + frontend
+    */  
 
 };
 
@@ -121,14 +129,17 @@ bool graph::removeVertex(std::string uniqueKey, std::string _vertexTypeLabel) {
     return false;
 }
 
-void communicate(std::string report) {
-
+void graph::communicate(std::string report) {
     //write unix time and message to logs
     std::ofstream logger("_data/logs.txt", std::ios::app);
     logger << time(0) << " " << report << "\n";
     logger.close();
 
-    //return to client
+
+    //return feedback to client
+    // ???
+
+    //close socket
     // ???
 }
 
