@@ -90,10 +90,10 @@ public:
                   std::string _vertex1Type, std::string _vertex2Type);
     void mergeVertex (int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
 
+    bool removeVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel);
     bool removeEdge(int transactionID, std::string _edgeTypeLabel, bool bidirectional,
                   std::string _vertex1ID, std::string _vertex2ID, 
                   std::string _vertex1Type, std::string _vertex2Type);
-    bool removeVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel);
 
     //receives a vertexTypeLabel, and returns all the vertices of that type that have a common property
     //in the form of a string of uniqueKeys separated by '~'
@@ -106,8 +106,7 @@ public:
 
     /*
     TODO:
-    *   Enum functions to integers and use switch case to call them
-    **  Refactor functions to push report/answer to answerQueue as well as the file they're working on to the filesBeingProcessedQueue, and pop them when done
+    **  Refactor functions to push file they're working on to the filesBeingProcessedQueue, and pop them when done
     **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue (include a while loop that checks if the file is in the queue, if it is, sleep for 0.4s)
     *   Application backend (is client + generates perfect commands) + frontend
     */
@@ -168,8 +167,7 @@ void graph::relationalQuery (int transactionID, std::string _vertex1ID, std::str
                 retVertexList += vertex + "~";
     }
 
-    //TODO: Announce success
-
+    answerQueue.push({transactionID, retVertexList});
 }
 
 std::unordered_map<std::string, std::string> graph::generatePropertiesToMatch(std::string _propertiesToMatch) {
@@ -246,7 +244,7 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
             retVertexList += vertex + "~";
     }
 
-    //TODO: Announce success
+    answerQueue.push({transactionID, retVertexList});
 }
 
 bool graph::removeEdge(int transactionID, std::string relation, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
@@ -255,8 +253,10 @@ bool graph::removeEdge(int transactionID, std::string relation, bool bidirection
     int vertex1Type = getIndexOfTypeOfVertex(_vertex1Type);
     int vertex2Type = getIndexOfTypeOfVertex(_vertex2Type);
 
-    if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1)
+    if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1) {
+        answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't remove edge from it."});
         return false;
+    }
     
     // label is brought to format "Relation-typeX_typeY"
     std::string completeLabel = relation + "-" + _vertex1Type + "_" + _vertex2Type;
@@ -265,65 +265,75 @@ bool graph::removeEdge(int transactionID, std::string relation, bool bidirection
     int edgeType = edgeTypeList.findIndex(completeLabel);
 
     //if that edge type doesn't exist, what are we supposed to be removing?
-    if(edgeType == -1)
+    if(edgeType == -1) {
+        answerQueue.push({transactionID, "Failure: Edge type doesn't exist, so edge can't exist either."});
         return false;
+    }
 
     //open up the files
     std::string dir = "_data/adjLists/" + completeLabel + "/";
     LL info(dir + "infofile.txt");
 
     //if vertex1ID doesn't exist in the infofile.txt, return false
-    if (!info.exists(_vertex1ID))
+    if (!info.exists(_vertex1ID)) {
+        answerQueue.push({transactionID, "Failure: Requested vertex has no edges of type " + completeLabel});
         return false;
+    }
 
     //else open the file for vertex1ID
     LL vertex1AdjList(dir + _vertex1ID + ".txt");
 
     //remove vertex2ID from it
-    if (!vertex1AdjList.erase(_vertex2ID))
+    if (!vertex1AdjList.erase(_vertex2ID)) {
+        answerQueue.push({transactionID, "Failure: " + _vertex1ID + " has no edge to " + _vertex2ID + " of type " + completeLabel});
         return false;
+    }
 
     //write changes to disk
     vertex1AdjList.writeToFile(dir + _vertex1ID + ".txt");
 
     if (bidirectional) {
         //if vertex2ID doesn't exist in the infofile.txt, return false
-        if (!info.exists(_vertex2ID))
+        if (!info.exists(_vertex2ID)) {
+            answerQueue.push({transactionID, "Failure: Requested vertex has no edges of type " + completeLabel});
             return false;
+        }
 
         //open the file for vertex2ID
         LL vertex2AdjList(dir + _vertex2ID + ".txt");
 
         //remove vertex1ID from it
-        if (!vertex2AdjList.erase(_vertex1ID))
+        if (!vertex2AdjList.erase(_vertex1ID)) {
+            answerQueue.push({transactionID, "Failure: " + _vertex2ID + " has no edge to " + _vertex1ID + " of type " + completeLabel});
             return false;
+        }
 
         // and write changes to disk
         vertex2AdjList.writeToFile(dir + _vertex2ID + ".txt");
     }
 
-    //TODO: Announce success
-
+    answerQueue.push({transactionID, "Success: Edge removed"});
     return true;
 }
 
 bool graph::removeVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel) {
 
     int vertexType = vertexTypeList.findIndex(_vertexTypeLabel);
-    if (vertexType == -1) // If vertex type doesn't exist, what are we supposed to be removing?
+    if (vertexType == -1) {// If vertex type doesn't exist, what are we supposed to be removing?
+        answerQueue.push({transactionID, "Failure: Vertex type doesn't exist, so vertex can't exist either."});
         return false;
+    }
 
     // If removal from btree successful
     if (bTreeArray[vertexType].erase(uniqueKey)) {
         // Delete the properties file
         std::string filepath = "_data/vertexProperties/" + uniqueKey + ".bin";
         std::remove(filepath.c_str());
-        //TODO: Announce success
+        answerQueue.push({transactionID, "Success: Vertex removed"});
         return true;
     }
 
-    //TODO: Announce failure
-
+    answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't remove it."});
     return false;
 }
 
@@ -369,8 +379,10 @@ bool graph::addEdge (int transactionID, std::string relation, bool bidirectional
     int vertex1Type = getIndexOfTypeOfVertex(_vertex1Type);
     int vertex2Type = getIndexOfTypeOfVertex(_vertex2Type);
 
-    if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1)
+    if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1) {
+        answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't add edge to it."});
         return false;
+    }
 
     // label is brought to format "Relation-typeX_typeY"
     std::string completeLabel = relation + "-" + _vertex1Type + "_" + _vertex2Type;
@@ -404,8 +416,10 @@ bool graph::addEdge (int transactionID, std::string relation, bool bidirectional
         LL vertex1AdjList(dir + _vertex1ID + ".txt");
 
         //if vertex2ID already exists in vertex1's adjList, return false
-        if (vertex1AdjList.exists(_vertex2ID))
+        if (vertex1AdjList.exists(_vertex2ID)) {
+            answerQueue.push({transactionID, "Failure: Edge already exists, can't add it again."});
             return false;
+        }
 
         //else insert it
         else {
@@ -447,8 +461,9 @@ bool graph::addEdge (int transactionID, std::string relation, bool bidirectional
     //update info file
     info.writeToFile(dir + "infofile.txt");
 
-    //TODO: Announce success
-
+    std::string feedback = "Success: edge added ";
+    feedback += (bidirectional ? "bidirectionally " : "unidirectionally ");
+    answerQueue.push({transactionID, feedback});
     return true;
 }
 
@@ -469,8 +484,10 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
     // Search in B tree array at vertexType-th index and check if that vertex exists already
-    if (bTreeArray[vertexType].search(uniqueKey) == -1)
+    if (bTreeArray[vertexType].search(uniqueKey) == -1) {
+        answerQueue.push({transactionID, "Failure: Vertex already exists, can't add it again."});
         return false;
+    }
 
     bTreeArray[vertexType].insert(uniqueKey);
 
@@ -488,8 +505,7 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
     file.write(_vertexProperties.c_str(), _vertexProperties.size());
     file.close();
 
-    //TODO: Announce success
-
+    answerQueue.push({transactionID, "Success: Vertex added"});
     return true;
 }
 
@@ -577,7 +593,7 @@ void graph::updateVertex(int transactionID, std::string uniqueKey, std::string _
     file2.write(properties.c_str(), properties.size());
     file2.close();
 
-    //TODO: Announce success
+    answerQueue.push({transactionID, "Success: Vertex updated"});
 }
 
 void graph::mergeVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties) {

@@ -47,23 +47,41 @@ void* decider(void* clientSocketPtr) {
     logger << time(0) << " | REQUEST: " << query << "\n";
 
     //Now, to parse the query and call graph functions accordingly:
+    //remove transaction ID and function name from query
 
     //first word of query is the transaction ID
     int transactionID = std::stoi(query.substr(0, query.find(" ")));
     query = query.substr(query.find(" ") + 1);
 
+    //second word of query is the function name
     std::string functionToCall = query.substr(0, query.find(" "));
     query = query.substr(query.find(" ") + 1);
 
-    //remove transaction ID and function name from query
+    //Call one of the graph functions accordingly.
+    //They will push a success/failure message to the answer queue
+    //along with the transaction ID, which will be used to identify the answer
+    //Except for the filter and relationalQuery functions, which will push the answer to the answer queue
+    if (functionToCall == "addVertex") {
 
-    //TODO: Make enum for functions based on functionToCall
+    } else if (functionToCall == "addEdge") {
 
-    /*
-    switch (query) {
+    } else if (functionToCall == "mergeVertex") {
 
+    } else if (functionToCall == "removeVertex") {
+
+    } else if (functionToCall == "removeEdge") {
+
+    } else if (functionToCall == "filter") {
+
+    } else if (functionToCall == "relationalQuery") {
+
+    } else {
+        std::cout << "Invalid function name" << std::endl;
+        //cleanup
+        close(clientSocket);
+        logger.close();
+        return NULL;
     }
-    */
 
     //pop answer from answer queue now (functions above will push to it)
     std::string feedback;
