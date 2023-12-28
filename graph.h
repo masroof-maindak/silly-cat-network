@@ -75,6 +75,9 @@ private:
     // Used to check properties of a vertex, used in filtering
     std::string fetchProperties(std::string uniqueKey);
 
+    // Genereates a hashmap of properties to match from a string of properties
+    std::unordered_map<std::string, std::string> generatePropertiesToMatch(std::string _propertiesToMatch);
+
 public:
 
     // Constructors
@@ -93,11 +96,17 @@ public:
     bool removeVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel);
 
     //receives a vertexTypeLabel, and returns all the vertices of that type that have a common property
+    //in the form of a string of uniqueKeys separated by '~'
     void filter (int transactionID, std::string _vertexTypeLabel, std::string _propertiesToMatch);
+
+    //recieves a node from a certain type, another type, a relation, and returns a list of nodes of 
+    //the second type that are connected to the first node by that relation, and have a certain set of properties
+    //in the form of a string of uniqueKeys separated by '~'
+    void relationalQuery (int transactionID, std::string _vertex1ID, std::string _vertex1Type, std::string _vertex2Type, std::string _edgeTypeLabel, std::string _propertiesToMatch);
 
     /*
     TODO:
-    *   relational queries
+    *   Enum functions to integers and use switch case to call them
     **  Refactor functions to push report/answer to answerQueue as well as the file they're working on to the filesBeingProcessedQueue, and pop them when done
     **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue (include a while loop that checks if the file is in the queue, if it is, sleep for 0.4s)
     *   Application backend (is client + generates perfect commands) + frontend
@@ -105,9 +114,65 @@ public:
 
 };
 
+void graph::relationalQuery (int transactionID, std::string _vertex1ID, std::string _vertex1Type, std::string _vertex2Type, std::string _edgeTypeLabel, std::string _propertiesToMatch) {
+    //Note: relationalQuery assumes that all provided information is valid.
 
+    bool noPropertiesToMatch = (_propertiesToMatch == "");
+    std::unordered_map<std::string, std::string> propertiesToMatch = generatePropertiesToMatch(_propertiesToMatch);
 
-void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string _propertiesToMatch) {
+    //first get all nodes of type _vertex2Type that have a relation with _vertex1ID, open the adjList for that relation
+    std::string completeLabel = _edgeTypeLabel + "-" + _vertex1Type + "_" + _vertex2Type;
+
+    //open the adjList for that relation
+    std::string dir = "_data/adjLists/" + completeLabel + "/";
+    LL adjList(dir + _vertex1ID + ".txt");
+    std::vector<std::string> type2Vertices = adjList.vecDump();
+
+    //now we have all the nodes of type _vertex2Type that have a relation with _vertex1ID, loop through them to match properties
+    std::string retVertexList;
+    for (std::string vertex : type2Vertices) {
+            
+            //fetch existing properties in format "key1:value1~key2:value2~...keyN:valueN~"
+            std::string properties = fetchProperties(vertex);
+
+            //skip checking the hashmap if the user didn't provide any properties to match with in the first place
+            if (noPropertiesToMatch) {
+                retVertexList += vertex + "~";
+                continue;
+            }
+    
+            //split the properties string by '~'
+            std::stringstream ss(properties);
+            std::string keyValueString;
+            bool match = true;
+    
+            while (std::getline(ss, keyValueString, '~')) {
+                //split the keyValueString string by ':'
+                std::string key, value;
+                std::stringstream ss2(keyValueString);
+                std::getline(ss2, key, ':');
+                std::getline(ss2, value, ':');
+    
+                //if the key exists in propertiesToMatch, check if the values match
+                if (propertiesToMatch.find(key) != propertiesToMatch.end()) {
+                    //if the values don't match, break out of the loop as this vertex is invalid now anyway
+                    if (propertiesToMatch[key] != value) {
+                        match = false;
+                        break;
+                    }
+                }            
+            }
+    
+            //if match is true though, i.e all the values satisfy the requirements set by the user, add the node to retNodeList
+            if (match)
+                retVertexList += vertex + "~";
+    }
+
+    //TODO: Announce success
+
+}
+
+std::unordered_map<std::string, std::string> graph::generatePropertiesToMatch(std::string _propertiesToMatch) {
 
     //generate hashmap of properties to match
     std::unordered_map<std::string, std::string> propertiesToMatch;
@@ -125,7 +190,15 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
         propertiesToMatch[key] = value;
     }
 
-    //Note: Filter assumes that the _vertexTypeLabel is valid.
+    return propertiesToMatch;
+}
+
+void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string _propertiesToMatch) {
+
+    bool noPropertiesToMatch = (_propertiesToMatch == "");
+    std::unordered_map<std::string, std::string> propertiesToMatch = generatePropertiesToMatch(_propertiesToMatch);
+
+    //Note: Filter assumes that the all provided information is valid.
     std::string retVertexList;
 
     //first acquire all nodes of that type
@@ -137,6 +210,12 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
     //loop through vector of nodes, open their files, check if they have the properties we want, if they do, add them to retNodeList
     for (std::string vertex : vertexList) {
         
+        //skip checking the hashmap if the user didn't provide any properties to match with in the first place
+        if (noPropertiesToMatch) {
+            retVertexList += vertex + "~";
+            continue;
+        }
+
         //fetch existing properties in format "key1:value1~key2:value2~...keyN:valueN~"
         std::string properties = fetchProperties(vertex);
 
