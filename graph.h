@@ -89,9 +89,30 @@ public:
                   std::string _vertex1Type, std::string _vertex2Type);
     void mergeVertex (std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
 
+    bool removeEdge(std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID);
+    bool removeVertex(std::string uniqueKey, std::string _vertexTypeLabel);
+
     //TODO: Filter functions + Relational Queries
 
 };
+
+bool graph::removeVertex(std::string uniqueKey, std::string _vertexTypeLabel) {
+
+    //remove from btree
+    int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
+
+    //if removal successfull
+    if (bTreeArray[vertexType].erase(uniqueKey)) {
+        
+        //remove properties file
+        std::string filepath = "_data/vertexProperties/" + uniqueKey + ".bin";
+        std::remove(filepath.c_str());
+        return true;
+        
+    }
+
+    return false;
+}
 
 void graph::dumpGraphData() {
     // Write vertex and edge type lists unconditionally with LL::writeToFile()

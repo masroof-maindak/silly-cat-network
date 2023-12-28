@@ -437,16 +437,6 @@ void bTree::removeRecursive(bnode* curr, std::string data) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-//Locked in:
 bool bTree::erase(std::string data) {
     if (searchInternal(root, data) == -1)
         return false;
