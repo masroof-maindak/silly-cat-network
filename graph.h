@@ -5,12 +5,13 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
+#include <unordered_map>
+
+#include "lib/bTree.h"
 #include "lib/LinkedList.h"
 #include "lib/adjacencyList.h"
 #include "lib/encryption.h"
-#include <unordered_map>
-#include <sstream>
-#include "lib/bTree.h"
 
 // Note: LL = LinkedList<std::string>
 
@@ -44,9 +45,9 @@ private:
     /*
     FILE STRUCTURE:
 
-    *  1. _data/vertexTypes.txt                  - just a sequential list of all the vertex types e.g typeX\ntypeY...
+    *  1. _data/vertexTypes.txt                  - A sequential list of all the vertex types, e.g typeX\ntypeY...
     
-    *  2. _data/edgeTypes.txt                    - just a sequential list of all the edge types, e.g Relation:typeX_typeY\ntypeA_typeB...
+    *  2. _data/edgeTypes.txt                    - A sequential list of all the edge types, e.g Relation:typeX_typeY\ntypeA_typeB...
     
     *  3. _data/adjLists/rel-typeX_typeY/z.txt   - Read edgeTypesList, where each entry denotes a directory
     *                                            - infofile.txt is a list of all the files in that directory, one file per line, without the .txt extension
@@ -59,6 +60,8 @@ private:
     *                                            - The rest will be written to when the program ends
     
     *  5. _data/vertexProperties/uniqueKey.txt   - stores all the properties in a file, one file per vertex
+    *                                            - Where the file's name is the uniqueKey of the vertex, which is arguably a
+    *                                            - security flaw and also invalidates the use of b trees for vertex lookup, but this is a prototype anyway
     *                                            - in this format: "{stringSize}key1:value1~key2:value2~...~keyN:valueN~"
     */
 
@@ -101,23 +104,24 @@ void graph::dumpGraphData() {
     vertexTypeList.writeToFile("data/vertexTypes.txt");
     edgeTypeList.writeToFile("data/edgeTypes.txt");
 
-    // Btrees get managed simultaneously by bTree class, so no need to write them here
+    // Btrees get managed in real time by the bTree class, so no need to write them here
 
     // Write adjLists
     // The appropriate directory structure is already created in the getIndexOfTypeOfEdge() function
     // So we just need to write the infofile.txt and the z.txt files
+
     std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
 
     //Loop through all the linked lists in the AdjListArray
     for (int i = 0; i < edgeTypes.size(); i++) {
 
-        // Generate the directory path (one dir per edge type -> _data/adjLists/rel-typeX_typeY)
+        // Generate the directory path (one dir per edge type -> e.g `_data/adjLists/rel-typeX_typeY/`)
         std::string dir = "data/adjLists/" + edgeTypes[i];
 
         // Create the infofile.txt for each dir (holds all the filenames in the dir)
         std::ofstream infofile(dir + "/infofile.txt");
 
-        // Loop through all the adjLists in the current LL to get the fromNodes, which we will use as filenames
+        // Loop through all the adjLists in the current LL to get the 'fromNodes', which we will use as filenames
         for (Node<adjList>* curr = adjListArray[i].begin(); curr != nullptr; curr = curr->next) {
 
             // Append these filenames to the infofile.txt
