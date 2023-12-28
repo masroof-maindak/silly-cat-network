@@ -12,7 +12,7 @@
 #include "lib/LinkedList.h"
 #include "lib/encryption.h"
 
-// Note: LL = LinkedList<std::string>
+
 
 void makeDir(std::string path, std::string newDirName) {
     std::string command = "mkdir -p " + path + newDirName;
@@ -28,7 +28,7 @@ private:
 
     // 1.
     // An array of b trees, each index of the array denotes a btree that corresponds to the index of that vertex type in the vertexTypeList
-    // Each b tree holds only the unique identifiers of all graph vertices of that vertex type
+    // Each b tree holds only the unique keys of all graph vertices of that vertex type
     std::vector<bTree> bTreeArray;
     
     // 2/3.
@@ -77,9 +77,6 @@ private:
     // For returning data to user
     std::string fetchProperties(std::string uniqueKey, std::string _vertexTypeLabel);
 
-    // writes info to logs and returns to client
-    void communicate (std::string report);
-
 public:
 
     // Constructors
@@ -92,55 +89,95 @@ public:
                   std::string _vertex1Type, std::string _vertex2Type);
     void mergeVertex (std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
 
-    bool removeEdge(std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID);
+    bool removeEdge(std::string _edgeTypeLabel, bool bidirectional,
+                  std::string _vertex1ID, std::string _vertex2ID, 
+                  std::string _vertex1Type, std::string _vertex2Type);
     bool removeVertex(std::string uniqueKey, std::string _vertexTypeLabel);
 
     /*
     TODO:
-    *   Implement removeEdge()
     *   filtering
     *   relational queries
-    *   convert to server
-    **  Refactor other functions to send reports to communicate() via global queue maybe?
+    **  Refactor other functions to push their reports to answerQueue as well as the file they're working on to the filesBeingProcessedQueue, and pop them when done
+    **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue
     *   Application backend (is client + generates perfect commands) + frontend
     */  
 
 };
 
-bool graph::removeEdge(std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID){
+bool graph::removeEdge(std::string relation, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
 
+    // Check if vertex1 and vertex2 exist in our bTrees
+    int vertex1Type = getIndexOfTypeOfVertex(_vertex1Type);
+    int vertex2Type = getIndexOfTypeOfVertex(_vertex2Type);
+
+    if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1)
+        return false;
+    
+    // label is brought to format "Relation-typeX_typeY"
+    std::string completeLabel = relation + "-" + _vertex1Type + "_" + _vertex2Type;
+
+    // first identify the TYPE of the edge from the edgeTypeList
+    int edgeType = edgeTypeList.findIndex(completeLabel);
+
+    //if that edge type doesn't exist, what are we supposed to be removing?
+    if(edgeType == -1)
+        return false;
+
+    //open up the files
+    std::string dir = "_data/adjLists/" + completeLabel + "/";
+    LL info(dir + "infofile.txt");
+
+    //if vertex1ID doesn't exist in the infofile.txt, return false
+    if (!info.exists(_vertex1ID))
+        return false;
+
+    //else open the file for vertex1ID
+    LL vertex1AdjList(dir + _vertex1ID + ".txt");
+
+    //remove vertex2ID from it
+    if (!vertex1AdjList.erase(_vertex2ID))
+        return false;
+
+    //write changes to disk
+    vertex1AdjList.writeToFile(dir + _vertex1ID + ".txt");
+
+    if (bidirectional) {
+        //if vertex2ID doesn't exist in the infofile.txt, return false
+        if (!info.exists(_vertex2ID))
+            return false;
+
+        //open the file for vertex2ID
+        LL vertex2AdjList(dir + _vertex2ID + ".txt");
+
+        //remove vertex1ID from it
+        if (!vertex2AdjList.erase(_vertex1ID))
+            return false;
+
+        // and write changes to disk
+        vertex2AdjList.writeToFile(dir + _vertex2ID + ".txt");
+    }
+
+    return true;
 }
 
 bool graph::removeVertex(std::string uniqueKey, std::string _vertexTypeLabel) {
 
     //remove from btree
-    int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
+    int vertexType = vertexTypeList.findIndex(_vertexTypeLabel);
+
+    if (vertexType == -1) //if vertex type doesn't exist, what are we supposed to be removing?
+        return false;
 
     //if removal successfull
     if (bTreeArray[vertexType].erase(uniqueKey)) {
-        
         //remove properties file
         std::string filepath = "_data/vertexProperties/" + uniqueKey + ".bin";
         std::remove(filepath.c_str());
         return true;
-
     }
 
     return false;
-}
-
-void graph::communicate(std::string report) {
-    //write unix time and message to logs
-    std::ofstream logger("_data/logs.txt", std::ios::app);
-    logger << time(0) << " " << report << "\n";
-    logger.close();
-
-
-    //return feedback to client
-    // ???
-
-    //close socket
-    // ???
 }
 
 void graph::dumpGraphData() {
@@ -199,8 +236,8 @@ bool graph::addEdge (std::string relation, bool bidirectional, std::string _vert
     std::string dir = "_data/adjLists/" + completeLabel + "/";
     LL info(dir + "infofile.txt");
 
-    bool vertex1Exists = info.findIndex(_vertex1ID) != -1;
-    bool vertex2Exists = info.findIndex(_vertex2ID) != -1;
+    bool vertex1Exists = info.exists(_vertex1ID);
+    bool vertex2Exists = info.exists(_vertex2ID);
 
     // if vertex1ID doesn't exist in the infofile.txt, create a new file for it and add vertex2ID to it
     if (!vertex1Exists) {
@@ -220,7 +257,7 @@ bool graph::addEdge (std::string relation, bool bidirectional, std::string _vert
         LL vertex1AdjList(dir + _vertex1ID + ".txt");
 
         //if vertex2ID already exists in vertex1's adjList, return false
-        if (vertex1AdjList.findIndex(_vertex2ID) != -1)
+        if (vertex1AdjList.exists(_vertex2ID))
             return false;
 
         //else insert it

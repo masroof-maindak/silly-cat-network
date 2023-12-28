@@ -83,6 +83,25 @@ public:
     //Constructor with one value
     LL(std::string _data, int dummy) : LinkedList<std::string>(_data) {}
 
+    //search for node with matching data and erase it
+    bool erase (std::string _data) {
+        for (Node<std::string>* node = this->head; node != nullptr; node = node->next) {
+            if (node->next->data == _data) {
+                //store address of where element to be deleted is pointing towards
+                Node<std::string>* whereToGoNext = node->next->next;
+
+                //delete requested node and assign stored address to current node
+                delete node->next;
+                node->next = whereToGoNext;
+
+                size--;
+
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Dump to vector<string>
     std::vector<std::string> vecDump() {
         std::vector<std::string> ans;
