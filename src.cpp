@@ -1,22 +1,14 @@
 #include <iostream>
-#include "graph.h"
 #include "lib/queue.h"
+#include <vector>
 #include <cstring>       //memset
 
 #include <unistd.h>      //socket-handling + system-level operations
 #include <sys/socket.h>  //for sockets
-
 #include <netinet/in.h>  //network structures, e.g sockaddr_in, used in conjunction with;
 #include <arpa/inet.h>   //handling IP addresses + converting b/w host & network addresses
-#include <pthread.h>     //threads
-
-#include <vector>        //store image
-#include <utility>       //pair
 #include <chrono>        //answer queue pops un-picked-up answer
-
-#define SLEEP_TIME 690000 //0.69s
-#define MAX_CLIENTS 5
-#define BUFFER_SIZE 512
+#include <pthread.h>     //threads
 
 struct answer {
     int transactionID;
@@ -26,6 +18,12 @@ struct answer {
 // Global Queues
 Queue<std::string> filesBeingProcessed; // holds names of files on disk that are being currently modified
 Queue<answer> answerQueue;              // stores generated answers, and pops them when no client picks an answer up for 5 seconds
+
+#include "graph.h"
+
+#define SLEEP_TIME 690000 //0.69s
+#define MAX_CLIENTS 5
+#define BUFFER_SIZE 512
 
 void* decider(void* clientSocketPtr) {
     int clientSocket = *((int*)(&clientSocketPtr));
@@ -57,10 +55,20 @@ void* decider(void* clientSocketPtr) {
     std::string functionToCall = query.substr(0, query.find(" "));
     query = query.substr(query.find(" ") + 1);
 
-    //Call one of the graph functions accordingly.
-    //They will push a success/failure message to the answer queue
-    //along with the transaction ID, which will be used to identify the answer
-    //Except for the filter and relationalQuery functions, which will push the answer to the answer queue
+    //the rest of the query is now the arguments to the function, convert them to a vector
+    std::vector<std::string> arguments;
+    while (query.find(" ") != std::string::npos) {
+        arguments.push_back(query.substr(0, query.find(" ")));
+        query = query.substr(query.find(" ") + 1);
+    }
+
+    /*
+    * Call one of the graph functions accordingly.
+    * They will push a success/failure message to the answer queue
+    * along with the transaction ID, which will be used to identify the answer
+    * Except for the filter and relationalQuery functions, which will push the answer to the answer queue
+    */
+
     if (functionToCall == "addVertex") {
 
     } else if (functionToCall == "addEdge") {
