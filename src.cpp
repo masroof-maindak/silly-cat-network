@@ -143,8 +143,10 @@ int main() {
     //create the thread that handles the answer queue
     pthread_t answerThread; //pops if the top of the queue remains unchanged for a fixed time period
     //e.g when the client disconnects
-    if (pthread_create(&answerThread, NULL, readAnswerQueue, NULL) != 0)
-        perror("Answer thread creation failed"); return 1;
+    if (pthread_create(&answerThread, NULL, readAnswerQueue, NULL) != 0) {
+        perror("Answer thread creation failed");
+        return 1;
+    }
 
     //PTHREAD_CREATE() arguments:
     //1. thread by reference
@@ -154,8 +156,10 @@ int main() {
 
     //big daddy server socket
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocket == -1)
-        perror("Socket creation failed"); return 1;
+    if (serverSocket == -1) {
+        perror("Socket creation failed"); 
+        return 1;
+    }
 
     //SOCKET() arguments:
     //af_inet = address family (ipv4) - others include AF_INET6 (ipv6), AF_UNIX (IPC comm. on the same device)
@@ -164,8 +168,10 @@ int main() {
 
     //make it so that it overwrites a previous iteration's binding to the same port
     int reuse = 1;
-    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1)
-        perror("setsockopt"); return 1;
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
+        perror("setsockopt"); 
+        return 1;
+    }
 
     //bind the socket to an IP address, port and network protocol
     struct sockaddr_in serverAddr;
@@ -180,12 +186,16 @@ int main() {
 	// s_addr is used to store the actual IP address in binary format.
 
     //bind - associates socket with specific network address (IP + port)
-    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1)
-        perror("Binding failed"); return 1;
+    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
+        perror("Binding failed"); 
+        return 1;
+    }
 
     //listen for incoming connections
-    if (listen(serverSocket, 5) == -1)
-        perror("Listening failed"); return 1;
+    if (listen(serverSocket, 5) == -1) {
+        perror("Listening failed"); 
+        return 1;
+    }
 
     //LISTEN() arguments:
     //1. make this socket ready to accept connections
@@ -212,14 +222,18 @@ int main() {
         //3. Pointer to socklen_t variable that stores size of addr.
 
         //in case of error, accept() returns -1
-        if (*clientSocket == -1)
-            perror("Failed to accept connection!"); return 1;
+        if (*clientSocket == -1) {
+            perror("Failed to accept connection!"); 
+            return 1;
+        }
 
         //create client thread
         //inits the client in a separate function, passing the socket as a parameter
         pthread_t clientThread;
-        if (pthread_create(&clientThread, NULL, decider, (void*)clientSocket) != 0)
-            perror("Thread creation failed"); return 1;
+        if (pthread_create(&clientThread, NULL, decider, (void*)clientSocket) != 0) {
+            perror("Thread creation failed"); 
+            return 1;
+        }
 
         pthread_detach(clientThread); // Detach the thread to allow it to clean up automatically
     }
