@@ -628,7 +628,7 @@ int bTree::searchInternal (bnode* curr, std::string data) {
     while (count < curr->keys.size() and data > curr->keys[count])
         count++;
 
-    if (data == curr->keys[count] and count < curr->keys.size()) {
+    if (count < curr->keys.size() and data == curr->keys[count]) {
         return curr->uniqueID;
     } else if (curr->isLeaf) {
         return -1;

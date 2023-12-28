@@ -367,8 +367,8 @@ int graph::getIndexOfTypeOfEdge(std::string label) {
     int ans = edgeTypeList.findIndex(label);
     if (ans == -1) {
         edgeTypeList.insert(label);
-        ans = edgeTypeList.getSize();
         makeDir("_data/adjLists/", label);
+        ans = edgeTypeList.getSize() - 1;
     }
     return ans;
 }
@@ -473,7 +473,7 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
         vertexTypeList.insert(_vertexTypeLabel);
         bTreeArray.push_back(bTree(_vertexTypeLabel));
         makeDir("_data/bTrees/", _vertexTypeLabel);
-        ans = vertexTypeList.getSize();
+        ans = vertexTypeList.getSize() - 1;
     }
     return ans;
 }
@@ -484,7 +484,7 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
     // Search in B tree array at vertexType-th index and check if that vertex exists already
-    if (bTreeArray[vertexType].search(uniqueKey) == -1) {
+    if (bTreeArray[vertexType].search(uniqueKey) != -1) {
         answerQueue.push({transactionID, "Failure: Vertex already exists, can't add it again."});
         return false;
     }
@@ -601,7 +601,7 @@ void graph::mergeVertex(int transactionID, std::string uniqueKey, std::string _v
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
     // Search in B tree array at vertexType-th index and check if that vertex exists already
-    if (bTreeArray[vertexType].search(uniqueKey) == -1)
+    if (bTreeArray[vertexType].search(uniqueKey) != -1)
         addVertex (transactionID, uniqueKey, _vertexTypeLabel, _vertexProperties);
     else
         updateVertex (transactionID, uniqueKey, _vertexTypeLabel, _vertexProperties);
