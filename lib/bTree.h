@@ -1,8 +1,10 @@
 #ifndef BTREE_H
 #define BTREE_H
 
+#include <vector>
 #include <fstream>
 #include "bnode.h"
+#include "queue.h"
 
 #define t 3
 #define MAX_CHILDREN 2*t
@@ -59,7 +61,47 @@ public:
     // Destructor
     ~bTree() {writeMetadata(); delete root;};
 
+    // Returns array of all values in tree
+    std::vector<std::string> dump();
+
 };
+
+std::vector<std::string> bTree::dump() {
+    std::vector<std::string> retValues;
+    std::string treePath = "_data/bTrees/" + treeName + "/";
+    std::ifstream file (treePath + "infofile.txt");
+    
+    //start with root while adding its children to queue
+    Queue<int> nodeIDs;
+
+    //add root's keys to vector
+    for (std::string key : root->keys)
+        retValues.push_back(key);
+
+    //add root's children to queue
+    for (int ptr : root->ptrs)
+        nodeIDs.push(ptr);
+
+    while (!nodeIDs.empty()) {
+        //open a child
+        std::string filename = treePath + std::to_string(nodeIDs.front()) + ".txt";
+        bnode* curr = new bnode(filename);
+        nodeIDs.pop();
+
+        //add all of curr's keys to vector
+        for (std::string key : curr->keys)
+            retValues.push_back(key);
+
+        //add all of curr's children to queue
+        for (int ptr : curr->ptrs)
+            nodeIDs.push(ptr);
+
+        //delete curr from memory
+        delete curr;
+    }
+
+    return retValues;
+}
 
 //'rotate' value
 void bTree::eraseSibling(bnode* curr, int index, int siblingIndex) {
