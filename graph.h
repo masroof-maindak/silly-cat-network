@@ -77,6 +77,9 @@ private:
     // For returning data to user
     std::string fetchProperties(std::string uniqueKey, std::string _vertexTypeLabel);
 
+    // writes info to logs and returns to client
+    void communicate ();
+
 public:
 
     // Constructors
@@ -92,9 +95,13 @@ public:
     bool removeEdge(std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID);
     bool removeVertex(std::string uniqueKey, std::string _vertexTypeLabel);
 
-    //TODO: Filter functions + Relational Queries
+    //TODO: Filter functions + Relational Queries + communicate
 
 };
+
+bool graph::removeEdge(std::string _edgeTypeLabel, std::string _vertex1ID, std::string _vertex2ID){
+
+}
 
 bool graph::removeVertex(std::string uniqueKey, std::string _vertexTypeLabel) {
 
@@ -108,10 +115,21 @@ bool graph::removeVertex(std::string uniqueKey, std::string _vertexTypeLabel) {
         std::string filepath = "_data/vertexProperties/" + uniqueKey + ".bin";
         std::remove(filepath.c_str());
         return true;
-        
+
     }
 
     return false;
+}
+
+void communicate(std::string report) {
+
+    //write unix time and message to logs
+    std::ofstream logger("_data/logs.txt", std::ios::app);
+    logger << time(0) << " " << report << "\n";
+    logger.close();
+
+    //return to client
+    // ???
 }
 
 void graph::dumpGraphData() {
