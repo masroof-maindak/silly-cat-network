@@ -107,6 +107,21 @@ void* decider(void* clientSocketPtr) {
         //arguments: transactionID, vertex1ID, vertex1Type, vertex2Type, edgeTypeLabel, properties
         g.relationalQuery(transactionID, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
 
+    } else if (functionToCall == "fetchVertexProperties") {
+
+        //arguments: transactionID, vertexID, vertexType
+        g.fetchVertexProperties(transactionID, arguments[0], arguments[1]);
+
+    } else if (functionToCall == "addVE") {
+
+        //arguments: transactionID, edgeTypeLabel, bidrectional, vertex1ID, vertex2ID, vertex1Type, vertex2Type, vertex2Properties
+        g.addVE(transactionID, arguments[0], stoi(arguments[1]), arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
+
+    } else if (functionToCall == "removeVE") {
+
+        //arguments: transactionID, edgeTypeLabel, bidrectional, vertex1ID, vertex2ID, vertex1Type, vertex2Type
+        g.removeVE(transactionID, arguments[0], stoi(arguments[1]), arguments[2], arguments[3], arguments[4], arguments[5]);
+        
     } else {
         std::cout << "Invalid function name" << std::endl;
         //cleanup

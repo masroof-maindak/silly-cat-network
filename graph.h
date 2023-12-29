@@ -129,7 +129,7 @@ void graph::addVE (int transactionID, std::string _edgeTypeLabel, bool bidirecti
 
     //this is practically only going to be used for when a new post is uploaded
     //so we can assume that the vertex1ID is the username of the user who uploaded the post
-    //and the vertex2ID is the uniqueKey of the post itself
+    //and the vertex2ID is the uniqueKey of the post itself, which gets init now
 
     addVertex(transactionID, _vertex2ID, _vertex2Type, _vertexProperties);
     addEdge (transactionID, _edgeTypeLabel, bidirectional, _vertex1ID, _vertex2ID, _vertex1Type, _vertex2Type);
