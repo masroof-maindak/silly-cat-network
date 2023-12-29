@@ -8,9 +8,9 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "lib/bTree.h"
 #include "lib/LinkedList.h"
 #include "lib/encryption.h"
+#include "lib/bTree.h"
 
 void makeDir(std::string path, std::string newDirName) {
     std::string command = "mkdir -p " + path + newDirName;
@@ -113,7 +113,6 @@ public:
     TODO:
     **  Refactor functions to push file they're working on to the filesBeingProcessedQueue, and pop them when done
     **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue (include a while loop that checks if the file is in the queue, if it is, sleep for 0.4s)
-    *   Application backend (is client + generates perfect commands) + frontend
     */
 
    ~graph() { dumpGraphData(); }
@@ -149,8 +148,6 @@ void graph::fetchVertexProperties (int transactionID, std::string uniqueKey, std
         answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't fetch it."});
         return;
     }
-
-    std::string a = fetchProperties(uniqueKey);
 
     // Fetch properties and push them to answerQueue    
     answerQueue.push({transactionID, fetchProperties(uniqueKey)});

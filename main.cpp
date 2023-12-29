@@ -1,24 +1,19 @@
 #include <iostream>
 #include <fstream>
+#include <vector>        //store image
 
 #include <unistd.h>      //socket-handling + system-level operations
 #include <sys/socket.h>  //for sockets
-
 #include <netinet/in.h>  //network structures, e.g sockaddr_in, used in conjunction with;
 #include <arpa/inet.h>   //handling IP addresses + converting b/w host & network addresses
 #include <pthread.h>     //threads
 
-#include <random>        //thread image ID generation
-#include <vector>        //store image
-#include <utility>       //pair
-#include <queue>         //processing/answer queues
+#include "lib/queue.h"   //Files being processed/Answer Queues
 #include <chrono>        //answer queue pops un-picked-up answer
 
 #define SLEEP_TIME 690000 //0.69s
 #define BUFFER_SIZE 512
 const char delimiter = '`';
-
-using namespace std;
 
 //structs
 struct answer {
@@ -27,8 +22,8 @@ struct answer {
 };
 
 //global queues
-queue<std::string> filesBeingProcessed;
-queue<answer> answerQueue;
+Queue<std::string> filesBeingProcessed;
+Queue<answer> answerQueue;
 
 #include "graph.h"
 
@@ -40,15 +35,19 @@ void* receiveImage(void* clientSocketPtr) {
     free(clientSocketPtr);
     std::ofstream logger("_data/logs.txt", std::ios::app);
 
-    char buffer[BUFFER_SIZE];
+    //receive query from client
+    char* buffer = new char[BUFFER_SIZE];
     ssize_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
     if (bytesRead < 1) {
         perror("Error receiving query");
-        close(clientSocket); pthread_exit(NULL);
+        close(clientSocket);
+        pthread_exit(NULL);
     }
 
+    // trim buffer to actual size of query and write query to log file
     std::string query = std::string(buffer, bytesRead);
     logger << time(0) << " | REQUEST: " << query << "\n";
+    delete [] buffer;
 
     //Now, to parse the query and call graph functions accordingly:
     //remove transaction ID and function name from query
@@ -61,20 +60,11 @@ void* receiveImage(void* clientSocketPtr) {
     std::string functionToCall = query.substr(0, query.find(delimiter));
     query = query.substr(query.find(delimiter) + 1);
 
-    std::cout << "Query after removing stuff.. " << query << "\n";
-
     //the rest of the query is now the arguments to the function, convert them to a vector
     std::vector<std::string> arguments;
     while (query.find(delimiter) != std::string::npos) {
         arguments.push_back(query.substr(0, query.find(delimiter)));
         query = query.substr(query.find(delimiter) + 1);
-    }
-
-    std::cout << "Received transaction ID: " << transaID << "\n";
-    std::cout << "Received function: " << functionToCall << "\n";
-    std::cout << "Received arguments: ";
-    for (int i = 0; i < arguments.size(); i++) {
-        std::cout << arguments[i] << " ";
     }
 
     /*
@@ -115,9 +105,8 @@ void* receiveImage(void* clientSocketPtr) {
         //arguments: transactionID, edgeTypeLabel, bidrectional, vertex1ID, vertex2ID, vertex1Type, vertex2Type
         g.removeVE(transaID, arguments[0], stoi(arguments[1]), arguments[2], arguments[3], arguments[4], arguments[5]);
     } else {
-
-        std::cout << "Invalid function name: " << functionToCall << "\n";
         //cleanup
+        std::cout << "Invalid function name: " << functionToCall << "\n";
         close(clientSocket);
         logger.close();
         return NULL;
@@ -150,7 +139,8 @@ void* receiveImage(void* clientSocketPtr) {
     }
 
     //cleanup + closing client socket
-    std::cout << "Successfully sent character count. Closing client socket." << std::endl;
+    logger << time(0) << " | RESPONSE: " << feedbackResponse << "\n";
+    std::cout << "Successfully sent response back. Closing client socket." << std::endl;
     close(clientSocket);
     pthread_exit(NULL);
 }
@@ -182,7 +172,7 @@ void* readAnswerQueue(void* arg) {
                     // Sleep for a short duration to avoid busy-waitings
                     struct timespec sleepTime;
                     sleepTime.tv_sec = 0;
-                    sleepTime.tv_nsec = 100000000; //100 ms
+                    sleepTime.tv_nsec = 200000000; //200 ms
                     nanosleep(&sleepTime, NULL);
                 }
             }
@@ -200,55 +190,71 @@ void* readAnswerQueue(void* arg) {
 }
 
 int main() {
+    //init answer thread
     pthread_t answerThread; //pops if the top of the queue remains unchanged for a fixed time period
     if (pthread_create(&answerThread, NULL, readAnswerQueue, NULL) != 0) {
-        perror("Answer thread creation failed"); return 1;
+        perror("Answer thread creation failed"); 
+        return 1;
     }
 
+    //init server socket
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
-        perror("Socket creation failed"); return 1;
+        perror("Socket creation failed"); 
+        return 1;
     }
 
+    // make it so that we can reuse the port instantly after closing and reopening the server
     int reuse = 1;
     if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) == -1) {
-        perror("setsockopt"); return 1;
+        perror("setsockopt");
+        return 1;
     }
 
+    //bind server socket to port 9989
     struct sockaddr_in serverAddr;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(9989);  //port 9989 basically - htons = host TO network short (like the data type)
-    serverAddr.sin_addr.s_addr = INADDR_ANY; //// All available network interfaces - e.g Wifi/Ethernet/Bluetooth, etc.
+    serverAddr.sin_family = AF_INET;         //ipv4
+    serverAddr.sin_port = htons(9989);       //port 9989 basically - htons = host TO network short (like the data type)
+    serverAddr.sin_addr.s_addr = INADDR_ANY; // All available network interfaces - e.g Wifi/Ethernet/Bluetooth, etc.
 
+    // convert human readable string to binary network address structure
     if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
-        perror("Binding failed"); return 1;
+        perror("Binding failed"); 
+        return 1;
     }
 
+    //listen for connections, and at most 5 connections can be queued
     if (listen(serverSocket, 5) == -1) {
-        perror("Listening failed"); return 1;
+        perror("Listening failed"); 
+        return 1;
     }
 
+    // public service announcement
     std::cout << "Server listening on port 9989..." << std::endl;
 
+    //accept client(s) infinitely
     while (true) {
         struct sockaddr_in clientAddr;
         socklen_t clientAddrLen = sizeof(clientAddr);
         int* clientSocket = (int*)malloc(sizeof(int));
         *clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
-
         
         if (*clientSocket == -1) {
-            perror("Failed to accept connection!"); return 1;
+            perror("Failed to accept connection!"); 
+            return 1;
         }
 
+        //send each client to a new thread
         pthread_t clientThread;
         if (pthread_create(&clientThread, NULL, receiveImage, (void*)clientSocket) != 0) {
-            perror("Thread creation failed"); return 1;
+            perror("Thread creation failed"); 
+            return 1;
         }
 
-        pthread_detach(clientThread); // Detach the thread to allow it to clean up automatically
+        pthread_detach(clientThread); //detach thread from main thread
     }
 
+    //cleanup
     close(serverSocket);
     return 0;
 }

@@ -79,7 +79,6 @@ int main() {
 
     std::cout << serverResponse << "\n";
 
-
     // Close the client socket
     close(clientSocket);
 

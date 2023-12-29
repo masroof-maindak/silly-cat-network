@@ -1,3 +1,2 @@
-1703874704 | REQUEST: 12341*bruh
-1703874939 | REQUEST: 12341*bruh
-1703875309 | REQUEST: 120941`addVertex`fatfatpankocat`cat`username:fatfatpankocat~!password:crosseyedcar~!email:pankster@gmail.com~age:2`
+1703875707 | REQUEST: 120941`addVertex`fatfatpankocat`cat`username:fatfatpankocat~!password:crosseyedcar~!email:pankster@gmail.com~age:2`
+1703875707 | RESPONSE: Failure: Vertex already exists, can't add it again.
