@@ -111,6 +111,7 @@ public:
     *   Application backend (is client + generates perfect commands) + frontend
     */
 
+   ~graph() { dumpGraphData(); }
 };
 
 void graph::relationalQuery (int transactionID, std::string _vertex1ID, std::string _vertex1Type, std::string _vertex2Type, std::string _edgeTypeLabel, std::string _propertiesToMatch) {
@@ -339,16 +340,16 @@ bool graph::removeVertex(int transactionID, std::string uniqueKey, std::string _
 
 void graph::dumpGraphData() {
     // Write vertex and edge type lists unconditionally with LL::writeToFile()
-    vertexTypeList.writeToFile("data/vertexTypes.txt");
-    edgeTypeList.writeToFile("data/edgeTypes.txt");
+    vertexTypeList.writeToFile("_data/vertexTypes.txt");
+    edgeTypeList.writeToFile("_data/edgeTypes.txt");
     // Btrees get managed in real time by the bTree class, so no need to write them here
     // Adj lists get managed in real time by whatever function accesses them, so no need to write them here
 }
 
 graph::graph(int fileCheckFlag) {
     // Can serialize {vertex,edge}TypeList instantly with LL constructor on data/{vertex,edge}Types.txt
-    vertexTypeList = LL("data/vertexTypes.txt");
-    edgeTypeList = LL("data/edgeTypes.txt");
+    vertexTypeList = LL("_data/vertexTypes.txt");
+    edgeTypeList = LL("_data/edgeTypes.txt");
 
     std::vector<std::string> vertexTypes = vertexTypeList.vecDump();
     std::vector<std::string> edgeTypes = edgeTypeList.vecDump();
@@ -356,8 +357,7 @@ graph::graph(int fileCheckFlag) {
     // Then for b trees, loop through vertex types and pass them as 'name' to btree file constructor.
     // The btree class will handle the rest
     for(std::string vertexType : vertexTypes) {
-        std::string dir = "data/bTrees/" + vertexType;
-        bTreeArray.push_back(bTree(dir, 0));
+        bTreeArray.push_back(bTree(vertexType, 0));
     }
 
     // No need to do anything for adj lists, they will be created/read/modified on the fly
@@ -368,6 +368,8 @@ int graph::getIndexOfTypeOfEdge(std::string label) {
     if (ans == -1) {
         edgeTypeList.insert(label);
         makeDir("_data/adjLists/", label);
+        std::ofstream file("_data/adjLists/" + label + "/infofile.txt");
+        file.close();
         ans = edgeTypeList.getSize() - 1;
     }
     return ans;
@@ -376,9 +378,16 @@ int graph::getIndexOfTypeOfEdge(std::string label) {
 bool graph::addEdge (int transactionID, std::string relation, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
 
     // Check if vertex1 and vertex2 exist in our bTrees
-    int vertex1Type = getIndexOfTypeOfVertex(_vertex1Type);
-    int vertex2Type = getIndexOfTypeOfVertex(_vertex2Type);
+    int vertex1Type = vertexTypeList.findIndex(_vertex1Type);
+    int vertex2Type = vertexTypeList.findIndex(_vertex2Type);
 
+    //if either of the vertex types don't exist, what are we supposed to be adding an edge to?
+    if(vertex1Type == -1 or vertex2Type == -1) {
+        answerQueue.push({transactionID, "Failure: Vertex type doesn't exist, so edge can't exist either."});
+        return false;
+    }
+
+    //check if both vertices exist in their respective bTrees
     if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1) {
         answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't add edge to it."});
         return false;
@@ -417,7 +426,7 @@ bool graph::addEdge (int transactionID, std::string relation, bool bidirectional
 
         //if vertex2ID already exists in vertex1's adjList, return false
         if (vertex1AdjList.exists(_vertex2ID)) {
-            answerQueue.push({transactionID, "Failure: Edge already exists, can't add it again."});
+            answerQueue.push({transactionID, "Failure: unidirectional edge already exists, can't add it again."});
             return false;
         }
 
@@ -462,7 +471,7 @@ bool graph::addEdge (int transactionID, std::string relation, bool bidirectional
     info.writeToFile(dir + "infofile.txt");
 
     std::string feedback = "Success: edge added ";
-    feedback += (bidirectional ? "bidirectionally " : "unidirectionally ");
+    feedback += (bidirectional ? "bidirectionally" : "unidirectionally");
     answerQueue.push({transactionID, feedback});
     return true;
 }
@@ -471,7 +480,14 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
     int ans = vertexTypeList.findIndex(_vertexTypeLabel);
     if (ans == -1) {
         vertexTypeList.insert(_vertexTypeLabel);
-        bTreeArray.push_back(bTree(_vertexTypeLabel));
+
+        bTree newT (_vertexTypeLabel);
+
+        bTreeArray.push_back(newT);
+
+        bTree testT = bTreeArray[bTreeArray.size() - 1];
+        
+        
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize() - 1;
     }

@@ -22,10 +22,15 @@ Queue<answer> answerQueue;              // stores generated answers, and pops th
 #include "graph.h"
 
 int main() {
-    graph g;
+    graph g(0);
 
     g.addVertex(100, "bingus", "cat", "username:bingus~!password:loveyoubuddy~!email:mujtaba.asim.amin@gmail.com~");
+    g.addVertex(101, "freegoblinpics", "cat", "username:freegoblinpics~!password:goblinsevilpass~!email:villain@gmail.com~");
 
-    g.mergeVertex(101, "bingus", "cat", "!password:fuckyeah");
+    g.mergeVertex(102, "bingus", "cat", "!password:fuckyeah");
+
+    g.filter(103, "cat", "");
+
+    g.addEdge(104, "follows", 0, "bingus", "freegoblinpics", "cat", "cat");
 
 }

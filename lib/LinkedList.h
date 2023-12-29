@@ -63,7 +63,7 @@ public:
     LL(std::string filename) {
         std::ifstream file(filename);
         if (!file.is_open()) {
-            std::cout << "File to deserialize LL, " << filename << "not found." << std::endl;
+            std::cout << "File to deserialize LL, '" << filename << "' not found." << std::endl;
             this->head = this->tail = nullptr;
             this->size = 0;
             return;            
@@ -117,7 +117,7 @@ template<class T>
 void LinkedList<T>::writeToFile(std::string filename) {
     std::ofstream file(filename);  
     if(!file.is_open()) {
-        std::cout << "File to serialize LL to not found." << std::endl;
+        std::cout << "File to serialize LL to not found: " << filename << "\n";
         return;
     }
 

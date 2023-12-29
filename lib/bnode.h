@@ -18,7 +18,6 @@ struct bnode {
     
     void writeToFile(std::string dir);  // serialize the bnode to a file
     void addKey(std::string data);      // insert key into bnode
-    int findKeyIndex(std::string data); // find index of key in bnode
 };
 
 

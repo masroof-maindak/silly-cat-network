@@ -44,9 +44,8 @@ protected:
 public:
 
     // Constructors
-    bTree(std::string name) : root(new bnode(69, true)),
-                              rootNodeID(69), treeName(name) {}         // default
-    bTree(std::string name, int fileCheckFlag);                         // file-based
+    bTree(std::string name) : rootNodeID(69), treeName(name) {root = new bnode(69, true);}      // default
+    bTree(std::string name, int fileCheckFlag);                                                 // file-based
 
     // Insertion/Deletion
     void insert(std::string data);
@@ -64,10 +63,38 @@ public:
     // Returns array of all values in tree
     std::vector<std::string> dump();
 
+    // copy operator
+    bTree& operator=(const bTree& other) {
+        if (this != &other) {
+            delete root;
+
+            root->isLeaf = other.root->isLeaf;
+            root->uniqueID = other.root->uniqueID;
+            root->keys = other.root->keys;
+            root->ptrs = other.root->ptrs;
+
+            rootNodeID = other.rootNodeID;
+            treeName = other.treeName;
+        }
+        return *this;
+    }
+
+    // copy constructor
+    bTree(const bTree& other) {
+        root = new bnode(69, true);
+        root->isLeaf = other.root->isLeaf;
+        root->uniqueID = other.root->uniqueID;
+        root->keys = other.root->keys;
+        root->ptrs = other.root->ptrs;
+        rootNodeID = other.rootNodeID;
+        treeName = other.treeName;
+    }
+
 };
 
 std::vector<std::string> bTree::dump() {
     std::vector<std::string> retValues;
+
     std::string treePath = "_data/bTrees/" + treeName + "/";
     std::ifstream file (treePath + "infofile.txt");
     
@@ -649,7 +676,7 @@ bTree::bTree(std::string name, int fileCheckFlag) {
     std::ifstream file (treePath + "infofile.txt");
     if (file.is_open()) {
         
-        //read in root node ID and number of bnodes in the tree
+        //read in root node ID and whether tree is empty or not
         file >> rootNodeID;
         file.close();
 
@@ -658,7 +685,7 @@ bTree::bTree(std::string name, int fileCheckFlag) {
         root = new bnode(rootFileName);
 
     } else {
-        std::cout << "Unable to open file for reading";
+        std::cout << "Unable to open bTree " << name << " for reading";
     }
 }
 
