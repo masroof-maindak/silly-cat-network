@@ -41,15 +41,16 @@ int main() {
     // g.removeVertex(107, "bingus", "cat");
 
     // g.addEdge(108, "follows", 0, "bingus", "meevinofficial", "cat", "cat");
-    // g.relationalQuery(109, "bingus", "cat", "cat", "follows", "");
+    // g.mergeVertex()
+    g.relationalQuery(109, "bingus", "cat", "cat", "follows", "age:2~");
 
-    g.addVE(110, "posts",0,"bingus", "bingus_12345678","cat", "post","desc:making my database!~tags:null~timestamp:12345678~");
+    // g.addVE(110, "posts",0,"bingus", "bingus_12345678","cat", "post","desc:making my database!~tags:null~timestamp:12345678~");
 
-    g.relationalQuery(111, "bingus", "cat", "post", "posts", "");
-    g.fetchVertexProperties(112, "bingus_12345678", "post");
+    // g.relationalQuery(111, "bingus", "cat", "post", "posts", "");
+    // g.fetchVertexProperties(112, "bingus_12345678", "post");
 
-    g.removeEdge(113, "posts", 0, "bingus", "bingus_12345678", "cat", "post");
-    g.removeVertex(114, "bingus_12345678", "post");
+    // g.removeEdge(113, "posts", 0, "bingus", "bingus_12345678", "cat", "post");
+    // g.removeVertex(114, "bingus_12345678", "post");
 
     answerQueue.print();
     

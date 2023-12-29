@@ -197,6 +197,9 @@ void graph::relationalQuery (int transactionID, std::string _vertex1ID, std::str
     
                 //if the key exists in propertiesToMatch, check if the values match
                 if (propertiesToMatch.find(key) != propertiesToMatch.end()) {
+                    //if the value matches, pop the key from propertiesToMatch
+                    propertiesToMatch.erase(key);
+
                     //if the values don't match, break out of the loop as this vertex is invalid now anyway
                     if (propertiesToMatch[key] != value) {
                         match = false;
@@ -205,11 +208,15 @@ void graph::relationalQuery (int transactionID, std::string _vertex1ID, std::str
                 }            
             }
     
-            //if match is true though, i.e all the values satisfy the requirements set by the user, add the node to retNodeList
-            if (match)
+            //if match is true though, i.e all the values satisfy the requirements set by the user, 
+            //and propertiesToMatch is empty i.e all the keys to match have been matched successfully
+            //add the node to retNodeList
+            if (match and propertiesToMatch.empty())
                 retVertexList += vertex + "~";
     }
 
+    if (retVertexList == "")
+        retVertexList = "Failure: No nodes of type " + _vertex2Type + " found that have a relation with " + _vertex1ID + " of type " + _vertex1Type + " and match the provided properties.";
     answerQueue.push({transactionID, retVertexList});
 }
 
@@ -274,6 +281,9 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
 
             //if the key exists in propertiesToMatch, check if the values match
             if (propertiesToMatch.find(key) != propertiesToMatch.end()) {
+                //if the value matches, pop the key from propertiesToMatch
+                propertiesToMatch.erase(key);
+
                 //if the values don't match, break out of the loop as this vertex is invalid now anyway
                 if (propertiesToMatch[key] != value) {
                     match = false;
@@ -287,6 +297,8 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
             retVertexList += vertex + "~";
     }
 
+    if (retVertexList == "")
+        retVertexList = "Failure: No nodes of type " + _vertexTypeLabel + " found that match the provided properties.";
     answerQueue.push({transactionID, retVertexList});
 }
 
