@@ -33,7 +33,7 @@ void* decider(void* clientSocketPtr) {
     std::ofstream logger("_data/logs.txt", std::ios::app);
 
     // Recieve string in a char buffer, and trim it down to length afterwards
-    char buffer[BUFFER_SIZE]; 
+    char* buffer = new char[BUFFER_SIZE];
     std::memset(buffer, 0, BUFFER_SIZE);
     int bytesReceived = recv(clientSocket, buffer, BUFFER_SIZE, 0);
     if (bytesReceived == -1) {
@@ -44,24 +44,25 @@ void* decider(void* clientSocketPtr) {
 
     //trimming query down to length and logging it
     std::string query = std::string(buffer, bytesReceived);
+    delete[] buffer;
     logger << time(0) << " | REQUEST: " << query << "\n";
 
     //Now, to parse the query and call graph functions accordingly:
     //remove transaction ID and function name from query
 
     //first word of query is the transaction ID
-    int transactionID = std::stoi(query.substr(0, query.find(" ")));
-    query = query.substr(query.find(" ") + 1);
+    int transactionID = std::stoi(query.substr(0, query.find("~")));
+    query = query.substr(query.find("~") + 1);
 
     //second word of query is the function name
-    std::string functionToCall = query.substr(0, query.find(" "));
-    query = query.substr(query.find(" ") + 1);
+    std::string functionToCall = query.substr(0, query.find("~"));
+    query = query.substr(query.find("~") + 1);
 
     //the rest of the query is now the arguments to the function, convert them to a vector
     std::vector<std::string> arguments;
     while (query.find(" ") != std::string::npos) {
-        arguments.push_back(query.substr(0, query.find(" ")));
-        query = query.substr(query.find(" ") + 1);
+        arguments.push_back(query.substr(0, query.find("~")));
+        query = query.substr(query.find("~") + 1);
     }
 
     /*
