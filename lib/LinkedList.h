@@ -83,25 +83,6 @@ public:
     //Constructor with one value
     LL(std::string _data, int dummy) : LinkedList<std::string>(_data) {}
 
-    //search for node with matching data and erase it
-    bool erase (std::string _data) {
-        for (Node<std::string>* node = this->head; node != nullptr; node = node->next) {
-            if (node->next->data == _data) {
-                //store address of where element to be deleted is pointing towards
-                Node<std::string>* whereToGoNext = node->next->next;
-
-                //delete requested node and assign stored address to current node
-                delete node->next;
-                node->next = whereToGoNext;
-
-                size--;
-
-                return true;
-            }
-        }
-        return false;
-    }
-
     // Dump to vector<string>
     std::vector<std::string> vecDump() {
         std::vector<std::string> ans;
@@ -129,7 +110,7 @@ void LinkedList<T>::writeToFile(std::string filename) {
 
 //get index of a value
 template<class T>
-inline int LinkedList<T>::findIndex(T _data) {
+int LinkedList<T>::findIndex(T _data) {
     int count = 0;
     for(Node<T>* node = head; node != nullptr; node = node->next, count++)
         if(node->data == _data)
@@ -139,7 +120,7 @@ inline int LinkedList<T>::findIndex(T _data) {
 
 //erase
 template<class T>
-inline bool LinkedList<T>::erase(Node<T>* it) {
+bool LinkedList<T>::erase(Node<T>* it) {
     //if empty list
     if (head == nullptr or it == nullptr)
         return false;
@@ -249,7 +230,7 @@ inline Node<T>* LinkedList<T>::getMid() {
 
 //exists or not?
 template <class T>
-inline bool LinkedList<T>::exists(T _data) {
+bool LinkedList<T>::exists(T _data) {
     for (Node<T>* node = head; node != nullptr; node = node->next)
         if (node->data == _data)
             return true;
@@ -258,7 +239,7 @@ inline bool LinkedList<T>::exists(T _data) {
 
 //searcher
 template <class T>
-inline Node<T>* LinkedList<T>::find(T _data) {
+Node<T>* LinkedList<T>::find(T _data) {
     for (Node<T>* node = head; node != nullptr; node = node->next)
         if (node->data == _data)
             return node;
@@ -267,7 +248,7 @@ inline Node<T>* LinkedList<T>::find(T _data) {
 
 //assignment operator
 template <class T>
-inline LinkedList<T> &LinkedList<T>::operator=(const LinkedList &L) {
+LinkedList<T> &LinkedList<T>::operator=(const LinkedList &L) {
     //check if assigning to itself
     if(this == &L)
         return *this;
@@ -297,7 +278,7 @@ inline LinkedList<T> &LinkedList<T>::operator=(const LinkedList &L) {
 
 //create empty linked list of given size
 template <class T>
-inline LinkedList<T>::LinkedList(int _size) {
+LinkedList<T>::LinkedList(int _size) {
     head = tail = nullptr;
     if(_size == 0) {return;}
     if(_size < 0) {throw std::out_of_range("Size cannot be negative");}

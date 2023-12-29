@@ -1,1 +1,2 @@
 follows-cat_cat
+posts-cat_post

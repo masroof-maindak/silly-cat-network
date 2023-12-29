@@ -17,12 +17,20 @@ public:
     T back() {return arr[_back];}
     void push(T);
     bool pop();
+    void print();    
     ~Queue() {delete[] arr;}
 };
 
+//print
+template <class T>
+void Queue<T>::print() {
+    for(int i = _front; i < _back; i++)
+        std::cout << arr[i] << "\n";
+}
+
 //push
 template <class T>
-inline void Queue<T>::push(T data) {
+void Queue<T>::push(T data) {
     if(_back == capacity) {
         capacity *= 2;
         int width = size();

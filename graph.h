@@ -81,17 +81,22 @@ private:
 public:
 
     // Constructors
-    graph() {}                // default - does nothing really
-    graph(int fileCheckFlag); // file-based - inits graph from files
+    graph() {makeDir("_data/", "vertexProperties");}      // default - makes an empty directory called vertexProperties
+    graph(int fileCheckFlag);                             // file-based - inits graph from files
 
     bool addVertex (int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
-    bool addEdge (int transactionID, std::string _edgeTypeLabel, bool bidirectional,
-                  std::string _vertex1ID, std::string _vertex2ID, 
-                  std::string _vertex1Type, std::string _vertex2Type);
+    bool addEdge (int transactionID, std::string _edgeTypeLabel, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type);
+    void addVE (int transactionID, std::string _edgeTypeLabel, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type, std::string _vertexProperties);
     void mergeVertex (int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties);
+
+    //Get a single vertex's properties
+    void fetchVertexProperties (int transactionID, std::string uniqueKey, std::string _vertexTypeLabel);
 
     bool removeVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel);
     bool removeEdge(int transactionID, std::string _edgeTypeLabel, bool bidirectional,
+                  std::string _vertex1ID, std::string _vertex2ID, 
+                  std::string _vertex1Type, std::string _vertex2Type);
+    void removeVE(int transactionID, std::string _edgeTypeLabel, bool bidirectional,
                   std::string _vertex1ID, std::string _vertex2ID, 
                   std::string _vertex1Type, std::string _vertex2Type);
 
@@ -113,6 +118,43 @@ public:
 
    ~graph() { dumpGraphData(); }
 };
+
+void graph::removeVE(int transactionID, std::string _edgeTypeLabel, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
+    // Can't fathom this being used for anything other than when a post is deleted, but including for completeness      
+    removeEdge(transactionID, _edgeTypeLabel, bidirectional, _vertex1ID, _vertex2ID, _vertex1Type, _vertex2Type);
+    removeVertex(transactionID, _vertex1ID, _vertex1Type);
+}
+
+void graph::addVE (int transactionID, std::string _edgeTypeLabel, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type, std::string _vertexProperties) {
+
+    //this is practically only going to be used for when a new post is uploaded
+    //so we can assume that the vertex1ID is the username of the user who uploaded the post
+    //and the vertex2ID is the uniqueKey of the post itself
+
+    addVertex(transactionID, _vertex2ID, _vertex2Type, _vertexProperties);
+    addEdge (transactionID, _edgeTypeLabel, bidirectional, _vertex1ID, _vertex2ID, _vertex1Type, _vertex2Type);
+}
+
+void graph::fetchVertexProperties (int transactionID, std::string uniqueKey, std::string _vertexTypeLabel) {
+    
+    // Check if vertex type exists
+    int vertexType = vertexTypeList.findIndex(_vertexTypeLabel);
+    if (vertexType == -1) {
+        answerQueue.push({transactionID, "Failure: Vertex type doesn't exist, so vertex can't exist either."});
+        return;
+    }
+
+    // check if vertex exists
+    if (bTreeArray[vertexType].search(uniqueKey) == -1) {
+        answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't fetch it."});
+        return;
+    }
+
+    std::string a = fetchProperties(uniqueKey);
+
+    // Fetch properties and push them to answerQueue    
+    answerQueue.push({transactionID, fetchProperties(uniqueKey)});
+}
 
 void graph::relationalQuery (int transactionID, std::string _vertex1ID, std::string _vertex1Type, std::string _vertex2Type, std::string _edgeTypeLabel, std::string _propertiesToMatch) {
     //Note: relationalQuery assumes that all provided information is valid.
@@ -200,13 +242,13 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
     //Note: Filter assumes that the all provided information is valid.
     std::string retVertexList;
 
-    //first acquire all nodes of that type
+    //first acquire all vertices of that type
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
-    //open the btree file for that type
+    //open the btree file for that type and dump contents to vector
     std::vector<std::string> vertexList = bTreeArray[vertexType].dump();
 
-    //loop through vector of nodes, open their files, check if they have the properties we want, if they do, add them to retNodeList
+    //loop through vector of vertices, open their files, check if they have the properties we want, if they do, add them to retNodeList
     for (std::string vertex : vertexList) {
         
         //skip checking the hashmap if the user didn't provide any properties to match with in the first place
@@ -285,7 +327,7 @@ bool graph::removeEdge(int transactionID, std::string relation, bool bidirection
     LL vertex1AdjList(dir + _vertex1ID + ".txt");
 
     //remove vertex2ID from it
-    if (!vertex1AdjList.erase(_vertex2ID)) {
+    if (!vertex1AdjList.erase(vertex1AdjList.find(_vertex2ID))) {
         answerQueue.push({transactionID, "Failure: " + _vertex1ID + " has no edge to " + _vertex2ID + " of type " + completeLabel});
         return false;
     }
@@ -304,7 +346,7 @@ bool graph::removeEdge(int transactionID, std::string relation, bool bidirection
         LL vertex2AdjList(dir + _vertex2ID + ".txt");
 
         //remove vertex1ID from it
-        if (!vertex2AdjList.erase(_vertex1ID)) {
+        if (!vertex2AdjList.erase(vertex2AdjList.find(_vertex1ID))) {
             answerQueue.push({transactionID, "Failure: " + _vertex2ID + " has no edge to " + _vertex1ID + " of type " + completeLabel});
             return false;
         }
@@ -514,11 +556,13 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
     //scan string for a value that starts with '!', replace it with its output after badHasher()
     checkStringForEncryptables(_vertexProperties, 0);
     
+
     //write string size
-    file.write((char*)_vertexProperties.size(), sizeof(int));
+    int stringSize = _vertexProperties.size();
+    file.write( (char*)&stringSize, sizeof(int));
 
     //write properties string
-    file.write(_vertexProperties.c_str(), _vertexProperties.size());
+    file.write(&_vertexProperties[0], _vertexProperties.size());
     file.close();
 
     answerQueue.push({transactionID, "Success: Vertex added"});
@@ -530,12 +574,13 @@ std::string graph::fetchProperties (std::string uniqueKey) {
     std::ifstream file("_data/vertexProperties/" + uniqueKey + ".bin", std::ios::binary);
 
     //read string size
-    int fileSize;
-    file.read((char*)&fileSize, sizeof(int));
+    int stringSize;
+    file.read((char*)&stringSize, sizeof(int));
 
     //read string contents
-    std::string properties; properties.resize(fileSize);
-    file.read(&properties[0], fileSize);
+    std::string properties; 
+    properties.resize(stringSize);
+    file.read(&properties[0], stringSize);
 
     //decrypt data if needed
     checkStringForEncryptables(properties, 1);
@@ -605,8 +650,9 @@ void graph::updateVertex(int transactionID, std::string uniqueKey, std::string _
 
     // Write the string to the file
     std::ofstream file2(readPath, std::ios::binary);
-    file2.write((char*)properties.size(), sizeof(int));
-    file2.write(properties.c_str(), properties.size());
+    int stringSize = properties.size();
+    file2.write((char*)&stringSize, sizeof(int));
+    file2.write(&properties[0], stringSize);
     file2.close();
 
     answerQueue.push({transactionID, "Success: Vertex updated"});
@@ -617,7 +663,7 @@ void graph::mergeVertex(int transactionID, std::string uniqueKey, std::string _v
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
     // Search in B tree array at vertexType-th index and check if that vertex exists already
-    if (bTreeArray[vertexType].search(uniqueKey) != -1)
+    if (bTreeArray[vertexType].search(uniqueKey) == -1)
         addVertex (transactionID, uniqueKey, _vertexTypeLabel, _vertexProperties);
     else
         updateVertex (transactionID, uniqueKey, _vertexTypeLabel, _vertexProperties);
