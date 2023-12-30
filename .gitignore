@@ -1,6 +1,7 @@
 .vscode
 src
 server
-dataDump
 client
 main
+a.out
+dataGenerate

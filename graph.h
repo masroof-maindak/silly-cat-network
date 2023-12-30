@@ -269,6 +269,8 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
         std::string keyValueString;
         bool match = true;
 
+        std::unordered_map<std::string, std::string> propertiesToMatchBak = propertiesToMatch;
+
         while (std::getline(ss, keyValueString, '~')) {
             //split the keyValueString string by ':'
             std::string key, value;
@@ -276,15 +278,17 @@ void graph::filter (int transactionID, std::string _vertexTypeLabel, std::string
             std::getline(ss2, key, ':');
             std::getline(ss2, value, ':');
 
-            //if the key exists in propertiesToMatch, check if the values match
-            if (propertiesToMatch.find(key) != propertiesToMatch.end()) {
-                //if the value matches, pop the key from propertiesToMatch
-                propertiesToMatch.erase(key);
+            //if the key exists in propertiesToMatch, then
+            if (propertiesToMatchBak.find(key) != propertiesToMatch.end()) {
 
-                //if the values don't match, break out of the loop as this vertex is invalid now anyway
-                if (propertiesToMatch[key] != value) {
+                //if the values DON'T match, break out of the loop as this vertex is invalid now anyway
+                if (propertiesToMatchBak[key] != value) {
                     match = false;
                     break;
+                
+                //if the value DOES match, pop the key from propertiesToMatch
+                } else {
+                    propertiesToMatchBak.erase(key);
                 }
             }            
         }

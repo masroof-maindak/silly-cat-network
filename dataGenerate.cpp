@@ -52,7 +52,8 @@ int main() {
     // g.removeEdge(113, "posts", 0, "bingus", "bingus_12345678", "cat", "post");
     // g.removeVertex(114, "bingus_12345678", "post");
 
-    answerQueue.print();
-    
+    g.filter(115, "cat", "username:randomcataccount~!password:newcataccount~");
 
+    g.filter(116, "post", "");
+    answerQueue.print();
 }

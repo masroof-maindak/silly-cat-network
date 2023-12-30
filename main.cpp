@@ -47,6 +47,7 @@ void* receiveImage(void* clientSocketPtr) {
     // trim buffer to actual size of query and write query to log file
     std::string query = std::string(buffer, bytesRead);
     logger << time(0) << " | REQUEST: " << query << "\n";
+    std::cout << "QUERY RECEIVED FROM CLIENT: " << query << "\n\n";
     delete [] buffer;
 
     //Now, to parse the query and call graph functions accordingly:
@@ -140,7 +141,7 @@ void* receiveImage(void* clientSocketPtr) {
 
     //cleanup + closing client socket
     logger << time(0) << " | RESPONSE: " << feedbackResponse << "\n";
-    std::cout << "Successfully sent response back. Closing client socket." << std::endl;
+    std::cout << "SENDING RESPONSE TO CLIENT: " << feedbackResponse << "\n\n";
     close(clientSocket);
     pthread_exit(NULL);
 }
@@ -243,6 +244,8 @@ int main() {
             perror("Failed to accept connection!"); 
             return 1;
         }
+
+        std::cout << "New client connected...\n\n";
 
         //send each client to a new thread
         pthread_t clientThread;
