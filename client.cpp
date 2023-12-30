@@ -1,21 +1,17 @@
 #include "lib/cpp-httplib/httplib.h"
-#include "lib/json.hpp"
 #include <iostream>
-#include <string>
-#include <cstring>
 
-using json = nlohmann::json;
 #define BUFFER_SIZE 512
 
-int main(void)
-{
+int main(void) {
     using namespace httplib;
 
     Server svr;
 
+    //upon receiving a POST request to /content_receiver...
     svr.Post("/content_receiver", [&](const httplib::Request &req, httplib::Response &res, const httplib::ContentReader &content_reader) {
         if (req.is_multipart_form_data()) {
-            // Handle multipart form data (if needed)
+            //for JSON data (I think)
         } else {
             std::string body;
             content_reader([&](const char *data, size_t data_length) {
@@ -56,9 +52,6 @@ int main(void)
                 exit(EXIT_FAILURE);
             }
 
-            // json received_json = json::parse(body);
-            // Do something with the JSON data (e.g., process it, validate it)
-
             // Recieve feedback/answer string from server in a char buffer,
             char* buffer = new char[BUFFER_SIZE];
             std::memset(buffer, 0, BUFFER_SIZE);
@@ -73,10 +66,10 @@ int main(void)
                 exit(1);
             }
             
-            // Trim buffer down to length
+            // trim buffer down to length
             std::string serverResponse = std::string(buffer, bytesRead);
             delete[] buffer;
-            std::cout << "RESPONSE WE GOT FROM THE SERVER: " << serverResponse << std::endl;
+            std::cout << "RESPONSE WE GOT FROM THE SERVER: " << serverResponse << "\n\n";
 
             close(clientSocket);
             
@@ -90,5 +83,5 @@ int main(void)
         }
     });
 
-    svr.listen("192.168.100.118", 1234);
+    svr.listen("localhost", 1234);
 }

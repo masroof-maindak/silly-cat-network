@@ -1,4 +1,4 @@
 Default:
-	g++ main.cpp -o server && ./server && rm server
+	g++ main.cpp -o server && ./server
 client:
-	g++ client.cpp -o client && ./client && rm client
+	g++ client.cpp -o client && ./client

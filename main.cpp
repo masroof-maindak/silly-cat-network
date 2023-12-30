@@ -47,7 +47,7 @@ void* receiveImage(void* clientSocketPtr) {
     // trim buffer to actual size of query and write query to log file
     std::string query = std::string(buffer, bytesRead);
     logger << time(0) << " | REQUEST: " << query << "\n";
-    std::cout << "QUERY RECEIVED FROM CLIENT: " << query << "\n\n";
+    std::cout << "QUERY RECEIVED FROM CLIENT: " << query << "\n";
     delete [] buffer;
 
     //Now, to parse the query and call graph functions accordingly:
