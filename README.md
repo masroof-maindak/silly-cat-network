@@ -1,9 +1,12 @@
-![manul](.github/manul.png)
+<h1 align="center">Silly Cat Network</h1>
+<p align="center">
+  <img src=".github/manul.png" alt="Manul Image">
+</p>
 
 ## Setup
-* First go to the WebApp directory and run `npm i` to automatically install dependencies.
-* Then, run the server and client binaries, in that order.
-* Lastly, to start the webapp server, run `npm run dev` inside WebApp/.
+* To install dependencies, run `npm i` in the 'WebApp' directory
+* Run the binaries for the server and client with `make` and `make client`
+* To start the webapp's server, run `npm run dev` inside WebApp/ again
 
 ## Introduction
 This is an implementation of a multi-threaded C++ graph database that uses bTrees and linked lists to store vertices and edges respectively. The database itself is fairly generic but a sample application developed with React has been provided that communicates with the database via an intermediary client which is responsible for transmitting queries and information.
@@ -28,5 +31,6 @@ The database/server advertises port #9989 which a client can connect to. The cli
 
 Complex application functionality has been implemented as a part of the webapp, e.g fetching a list of nodes, looping through them and grabbing all the information from them. The frontend itself is fairly limited in terms of its functionality (for instance there are no options to delete a post/account or follow another account) but the database is reasonably robust in terms of what it CAN do (and the implementation of the aforementioned features only involves sending a different query to the server).
 
-## Acknowledgement
+## Acknowledgements
 * [cpp-httplib](https://github.com/yhirose/cpp-httplib)
+* [Anastasiya Dalenka](https://unsplash.com/photos/a-gray-and-white-cat-standing-next-to-a-pile-of-rocks-zbMs9gNyW3s)
