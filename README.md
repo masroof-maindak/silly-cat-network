@@ -1,3 +1,4 @@
+![manul](.github/manul.png)
 
 ## Setup
 * First go to the WebApp directory and run `npm i` to automatically install dependencies.
@@ -13,7 +14,7 @@ The bTree, LinkedList and Queue classes are my own implementations and the forme
 Furthermore, while storing data to disk, the user can also choose to encrypt certain properties if they wish to do so, via an elementary but scalable hashing algorithm. These encrypted properties are also automatically decrypted while being updated or fetched.
 
 ## Performance
-In addition, the program is also extremely memory-efficient. The only data structures that will be kept in memory in an idle state are two linked lists of the TYPES of vertices and edges in our graph respectively, and an array of bTrees that is same size as our vertexTypeList. The two linked lists will be serialized/deserialized at program starting/termination but everything else is updated in real time and logged to a file.
+In addition, the program is also extremely memory-efficient. This is largely because the only data structures that will be kept in memory in an idle state are two linked lists of the TYPES of vertices and edges in our graph respectively, and an array of bTrees that is same size as our vertexTypeList. The two linked lists will be serialized/deserialized at program starting/termination but everything else is updated in real time and logged to a file.
 
 One index in the prior-mentioned array of B Trees holds only the unique keys of vertices of its corresponding type in the vertexTypeList. A bTree only holds the root node in memory in an idle state. Child (b)nodes are only accessed when operations need to be performed on them. Edge information is also only fetched/written to when needed.
 
