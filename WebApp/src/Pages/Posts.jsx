@@ -89,7 +89,7 @@ const Posts = () => {
         pageSize={itemsPerPage}
         onChange={handleChangePage}
         showSizeChanger={false}
-        style={{ textAlign: "center" }}
+        style={{ textAlign: "center", marginBottom: "20px"}}
       />
     </div>
   );

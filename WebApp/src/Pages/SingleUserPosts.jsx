@@ -21,7 +21,7 @@ const SingleUserPosts = () => {
       .post(
         APIURL,
         //req server for all posts of a user
-        generateRandomSixDigitNumber()+"`relationalQuery`" + profilesData.name + "`cat`post`posts``"
+        generateRandomSixDigitNumber() + "`relationalQuery`" + profilesData.name + "`cat`post`posts``"
       )
       .then((res) => {
         const user = res.data.replace(/~$/, "");
@@ -63,36 +63,36 @@ const SingleUserPosts = () => {
         <div className="col-1">
           <Button
             type="primary"
-            className='btnClass'
+            style={{ backgroundColor: "#db930d" }}
             onClick={() => {
               onClose(true);
             }}
           >
-            Add New Post
+            <span style={{ background: "#db930d", color: "#242015" }}>Create Post</span>
           </Button>
         </div>
         <div className="col-1"></div>
         <div className="col-1">
           <Button
             type="primary"
-            className='btnClass'
+            style={{ backgroundColor: "#db930d" }}
             onClick={() => {
               navigate("/friends");
             }}
           >
-            Show Users
+            <span style={{ background: "#db930d", color: "#242015" }}>Show Users</span>
           </Button>
         </div>
         <div className="col-1"></div>
         <div className="col-1">
           <Button
             type="primary"
-            className='btnClass'
+            style={{ backgroundColor: "#db930d" }}
             onClick={() => {
               navigate("/posts");
             }}
           >
-            Show All Posts
+            <span style={{ background: "#db930d", color: "#242015" }}>Show All Posts</span>
           </Button>
         </div>
       </div>
@@ -112,7 +112,7 @@ const SingleUserPosts = () => {
         pageSize={itemsPerPage}
         onChange={handleChangePage}
         showSizeChanger={false}
-        style={{ textAlign: "center" }}
+        style={{ textAlign: "center", marginBottom: "20px"}}
       />
     </div>
   );

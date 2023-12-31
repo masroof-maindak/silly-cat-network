@@ -32,7 +32,3 @@ input[type="password"] {
 .card-body {
     background-color: #3a3124;
 }
-
-.ant-modal-header {
-    color: "#ebe0bb" !important;
-}

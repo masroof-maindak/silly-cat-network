@@ -45,22 +45,21 @@ const AllProfiles = () => {
       </div>
       <div className='row'>
         {currentProfiles.map((item, index) => (
-          <div key={index} className='col-4'>
-            <div className='card m-2 p-1' style={{ background: "#3a3124" }}>
+          <div key={index} className='col-4 d-flex justify-content-between' style={{}}>
+
+            <div className='card mb-3 p-1' style={{ width: "300px", background: "#3a3124" }}>
+
               <div className='card-body'>
-                {/* <img src={item.avatar} alt={`Avatar for ${item.nickname}`} /> */}
-                <h4 style={{ color: "#ebe0bb", background: "#3a3124" }}>{item.name}</h4>
+                <h5 style={{ color: "#ebe0bb", background: "#3a3124" }}>{item.name}</h5>
+                
                 <Button type='primary' onClick={() => {
                   navigate('/userposts', { state: { item } })
                 }}
                   style={{ background: "#db930d" }}
                 >
-                  <span
-                    style={{ background: "#db930d", color: "#242015" }}
-                  >
-                    Open Posts
-                  </span>
+                  <span style={{ background: "#db930d", color: "#242015" }}>Open Posts</span>
                 </Button>
+              
               </div>
             </div>
           </div>
