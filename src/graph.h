@@ -8,9 +8,9 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "lib/LinkedList.h"
-#include "lib/encryption.h"
-#include "lib/bTree/bTree.h"
+#include "../lib/LinkedList.h"
+#include "../lib/encryption.h"
+#include "../lib/bTree/bTree.h"
 
 void makeDir(std::string path, std::string newDirName) {
     std::string command = "mkdir -p " + path + newDirName;

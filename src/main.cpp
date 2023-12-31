@@ -8,7 +8,7 @@
 #include <arpa/inet.h>   //handling IP addresses + converting b/w host & network addresses
 #include <pthread.h>     //threads
 
-#include "lib/queue.h"   //Files being processed/Answer Queues
+#include "../lib/queue.h"   //Files being processed/Answer Queues
 #include <chrono>        //answer queue pops un-picked-up answer
 
 #define SLEEP_TIME 690000 //0.69s

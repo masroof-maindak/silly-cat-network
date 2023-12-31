@@ -3529,3 +3529,21 @@
 1704025560 | RESPONSE: desc:asdasd~timestamp:1703940982~
 1704025563 | REQUEST: 740335690`filter`cat``
 1704025563 | RESPONSE: Zubair~freegoblinpics~+Zubair+~+values.username+~Junaid~Shafy~Zubairr~ab~fatfatpankocat~meevinofficial~randomcataccount~bingus~fatfatpankocat~
+1704025612 | REQUEST: 365878154`filter`post``
+1704025612 | RESPONSE: Zubair_123457~Junaid1703943180~Zubair1703940982~Zubair_123456~ab1703957101~bingus_123124~bingus_123125~
+1704025612 | REQUEST: 910353437`fetchVertexProperties`Zubair_123457`post`
+1704025612 | RESPONSE: desc:making my database3~timestamp:123457~
+1704025612 | REQUEST: 646040588`fetchVertexProperties`Junaid1703943180`post`
+1704025612 | RESPONSE: desc:Junaid demo post~timestamp:1703943180~
+1704025612 | REQUEST: 147795830`fetchVertexProperties`Zubair1703940982`post`
+1704025612 | RESPONSE: desc:asdasd~timestamp:1703940982~
+1704025612 | REQUEST: 593645342`fetchVertexProperties`Zubair_123456`post`
+1704025612 | RESPONSE: desc:making my database2~timestamp:123456~
+1704025612 | REQUEST: 928677324`fetchVertexProperties`ab1703957101`post`
+1704025612 | RESPONSE: desc:making my db4~timestamp:1703957101~
+1704025612 | REQUEST: 354247966`fetchVertexProperties`bingus_123124`post`
+1704025612 | RESPONSE: desc:making my database~timestamp:123124~
+1704025612 | REQUEST: 652920574`fetchVertexProperties``post`
+1704025612 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704025612 | REQUEST: 840247344`fetchVertexProperties`bingus_123125`post`
+1704025612 | RESPONSE: desc:making my database2~timestamp:123125~
