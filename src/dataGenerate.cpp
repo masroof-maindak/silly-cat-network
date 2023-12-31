@@ -17,7 +17,7 @@ int main() {
     graph g(0);
 
     //Add cats
-    g.addVertex(100, "bingus", "cat", "username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2");
+    // g.addVertex(100, "bingus", "cat", "username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2");
     // g.addVertex(101, "freegoblinpics", "cat", "username:freegoblinpics~!password:goblinsevilpass~!email:villain@gmail.com~");
 
     //Update properties

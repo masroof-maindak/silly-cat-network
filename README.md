@@ -4,7 +4,8 @@
 </p>
 
 ## Setup
-* To install dependencies, run `npm i` in the 'WebApp' directory
+* Clone the repo with  the `--recursive` flag to download the submodule too
+* To install dependencies, run `npm i` inside the 'WebApp' directory
 * Run the binaries for the server and client with `make` and `make client`
 * To start the webapp's server, run `npm run dev` inside WebApp/ again
 
