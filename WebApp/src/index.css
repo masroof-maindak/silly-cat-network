@@ -28,3 +28,11 @@ input[type="password"] {
     border: 1px solid #3a3124; /* Border color */
     /* Other desired styles */
 }
+
+.card-body {
+    background-color: #3a3124;
+}
+
+.ant-modal-header {
+    color: "#ebe0bb" !important;
+}
