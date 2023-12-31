@@ -1,4 +1,8 @@
-```To run SillyCatNetwork, first start the server and then the client by executing the binaries named 'server' and 'client' respectively. Then to start the webapp, run `npm run dev` inside the WebApp directory.```
+
+### Set up/Running
+* First go to the WebApp directory and run `npm i` to automatically install dependencies.
+* Then, start the server and then the client by executing the binaries named 'server' and 'client' respectively. 
+* Lastly, to start the webapp, run `npm run dev` inside the WebApp directory.
 
 ### Introduction
 This is an implementation of a multi-threaded C++ graph database that uses bTrees and linked lists to store vertices and edges respectively. The database itself is fairly generic but a sample application developed with React has been provided that communicates with the database via an intermediary client which is responsible for transmitting queries and information.
