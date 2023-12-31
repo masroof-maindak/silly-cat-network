@@ -45,8 +45,9 @@ int main() {
     // g.relationalQuery(111, "bingus", "cat", "post", "posts", "");
     // g.fetchVertexProperties(112, "bingus_12345678", "post");
 
-    g.fetchVertexProperties(113, "bingus", "cat");
+    // g.fetchVertexProperties(113, "bingus", "cat");
 
-    // g.filter(115, "post", "");
+    g.filter(114, "post", "");
+
     answerQueue.print();
 }
