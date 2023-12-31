@@ -1,10 +1,10 @@
 
-## Set up/Running
+## Setup
 * First go to the WebApp directory and run `npm i` to automatically install dependencies.
-* Then, start the server and then the client by executing the binaries named 'server' and 'client' respectively. 
-* Lastly, to start the webapp, run `npm run dev` inside the WebApp directory.
+* Then, run the server and client binaries, in that order.
+* Lastly, to start the webapp server, run `npm run dev` inside WebApp/.
 
-### Introduction
+## Introduction
 This is an implementation of a multi-threaded C++ graph database that uses bTrees and linked lists to store vertices and edges respectively. The database itself is fairly generic but a sample application developed with React has been provided that communicates with the database via an intermediary client which is responsible for transmitting queries and information.
 
 ## Features
@@ -23,9 +23,9 @@ Operations pertaining to vertices are particularly efficient, due to the decisio
 One unfortunate linear time complexity penalty present throughout the entire program is having to parse either a string of vertices/edges separated by a delimiter or parsing a string for properties. A proper JSON implementation would certainly ameliorate this problem though. One step taken that does slightly help with this problem is the use of a hashmap in the 'mergeVertex' function to check/update key-value format properties in constant time.
 
 ## Connections
-The database/server advertises port #9989 which a client can connect to. The client (application backend), upon receiving a POST request from the React webapp (via the REST API credited below), initializes a new client socket, binds it to the aforementioned server socket, transmits the query as is, receives a response from the server, and forwards it unconditionally.
+The database/server advertises port #9989 which a client can connect to. The client (application backend), upon receiving a POST request from the React + Vite webapp (via the REST API credited below), initializes a new client socket, binds it to the aforementioned server socket, transmits the query as is, receives a response from the server, and forwards it unconditionally.
 
-Complex application functionality has been implemented as a part of the webapp, e.g fetching a list of nodes, looping through them and grabbing all the information from them. The frontend itself is fairly limited in terms of its functionality but the database is reasonably robust in terms of what it CAN do.
+Complex application functionality has been implemented as a part of the webapp, e.g fetching a list of nodes, looping through them and grabbing all the information from them. The frontend itself is fairly limited in terms of its functionality (for instance there are no options to delete a post/account or follow another account) but the database is reasonably robust in terms of what it CAN do (and the implementation of the aforementioned features only involves sending a different query to the server).
 
 ## Acknowledgement
 * [cpp-httplib](https://github.com/yhirose/cpp-httplib)
