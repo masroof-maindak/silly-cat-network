@@ -3,32 +3,49 @@
 * {
     background-color: #242015;
     color: #ebe0bb;
-    font-family: 'Maple Mono', monospace;
+    font-family: 'Maple Mono', monospace !important;
 }
 
-/* Colour of text in field */
+/* Colour of placeholder text in field */
 ::placeholder {
-    font-family: 'Maple Mono', monospace !important;
     color: #5f4e41 !important;
 }
 
- 
 /* Colour of text in field while typing */
 input[type="text"],
 input[type="password"] {
     color: #d2c3a4 !important;
 }
 
-/* Form shit */
+/* Input field for password */
 .ant-input {
     background-color: #242015 !important;
-}
-.swamp-form {
-    background-color: #242015; /* Dark background color */
-    border: 1px solid #3a3124; /* Border color */
-    /* Other desired styles */
+    color: #ebe0bb;
 }
 
+/* Form in general */
+.swamp-form {
+    background-color: #242015;
+    border: 1px solid #3a3124;
+}
+
+/* post body*/
 .card-body {
     background-color: #3a3124;
+}
+
+/* add new post box */
+:where(.css-dev-only-do-not-override-gzal6t).ant-modal .ant-modal-content {
+    position: relative;
+    background-color: #242015;
+    background-clip: padding-box;
+    border: 1px solid #3a3124;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px 0 #211d13, 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    pointer-events: auto;
+    padding: 20px 24px;
+}
+
+.ant-btn.css-dev-only-do-not-override-gzal6t.ant-btn-default {
+    border: none;
 }

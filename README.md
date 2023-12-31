@@ -35,3 +35,4 @@ Complex application functionality has been implemented as a part of the webapp, 
 ## Acknowledgements
 * [cpp-httplib](https://github.com/yhirose/cpp-httplib)
 * [Anastasiya Dalenka](https://unsplash.com/photos/a-gray-and-white-cat-standing-next-to-a-pile-of-rocks-zbMs9gNyW3s)
+* [Maple Mono](https://github.com/subframe7536/Maple-font)

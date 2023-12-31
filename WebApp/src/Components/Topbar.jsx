@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Menu } from "antd";
+import { Layout } from "antd";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -31,25 +31,33 @@ const TopBar = () => {
       }}
     >
       <div
-        style={{ color: "#ebe0bb" }}
+        style={{
+          color: "#ebe0bb"
+        }}
         onClick={() => {
           navigate("/posts");
         }}
       >
-        Silly Cat Network
+        <h4>
+          Silly Cat Network
+        </h4>
       </div>
-      {username && (
-        <span style={{ color: "#ebe0bb" }}>
-          <UserOutlined style={{ marginRight: 8, color: "#ebe0bb" }} />
-          {username}
-        </span>
-      )}
-      <LogoutOutlined
-        title="Logout"
-        key="2"
-        onClick={onLogout}
-        style={{ color: "#ebe0bb" }}
-      ></LogoutOutlined>
+
+      <div>
+        {username && (
+          <span style={{ color: "#ebe0bb" }}>
+            <UserOutlined style={{ marginRight: 8, color: "#ebe0bb" }} />
+            {username}
+          </span>
+        )}
+        <LogoutOutlined
+          title="Logout"
+          key="2"
+          onClick={onLogout}
+          style={{ color: "#ebe0bb", marginLeft: 20}}
+        ></LogoutOutlined>
+      </div>
+
     </Header>
   );
 };

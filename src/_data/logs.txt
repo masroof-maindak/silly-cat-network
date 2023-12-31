@@ -3547,3 +3547,253 @@
 1704025612 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
 1704025612 | REQUEST: 840247344`fetchVertexProperties`bingus_123125`post`
 1704025612 | RESPONSE: desc:making my database2~timestamp:123125~
+1704033578 | REQUEST: 706309530`fetchVertexProperties`bingus`cat`
+1704033578 | RESPONSE: username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2
+1704033578 | REQUEST: 230930161`filter`post``
+1704033578 | RESPONSE: Failure: No nodes of type post found that match the provided properties.
+1704033578 | REQUEST: 230403969`fetchVertexProperties`Failure: No nodes of type post found that match the provided properties.`post`
+1704033578 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704033583 | REQUEST: 621798361`filter`cat``
+1704033583 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704033588 | REQUEST: 499883740`relationalQuery``cat`post`posts``
+1704033588 | RESPONSE: Failure: No nodes of type post found that have a relation with  of type cat and match the provided properties.
+1704033588 | REQUEST: 665025365`fetchVertexProperties`Failure: No nodes of type post found that have a relation with  of type cat and match the provided properties.`post`
+1704033588 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704033592 | REQUEST: 376789372`filter`post``
+1704033592 | RESPONSE: Failure: No nodes of type post found that match the provided properties.
+1704033592 | REQUEST: 775126257`fetchVertexProperties`Failure: No nodes of type post found that match the provided properties.`post`
+1704033592 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704033618 | REQUEST: 559281721`addVE`posts`0`bingus`bingus1704033578`cat`post`desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~`
+1704033618 | RESPONSE: Success: Vertex added
+1704033629 | REQUEST: 592230164`filter`post``
+1704033629 | RESPONSE: bingus1704033578~
+1704033629 | REQUEST: 922124627`fetchVertexProperties`bingus1704033578`post`
+1704033629 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704033629 | REQUEST: 577842362`fetchVertexProperties``post`
+1704033629 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704033649 | REQUEST: 651698520`filter`cat``
+1704033649 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704033746 | REQUEST: 700021507`filter`cat``
+1704033746 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704033768 | REQUEST: 408859608`fetchVertexProperties`randomcataccount`cat`
+1704033768 | RESPONSE: username:randomcataccount~!password:newcataccount~!email:mynew_cataccount@gmail.com~age:2
+1704033769 | REQUEST: 680511328`filter`post``
+1704033769 | RESPONSE: bingus1704033578~
+1704033769 | REQUEST: 207677767`fetchVertexProperties`bingus1704033578`post`
+1704033769 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704033769 | REQUEST: 293383612`fetchVertexProperties``post`
+1704033769 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704034062 | REQUEST: 660015943`addVE`posts`0`randomcataccount`randomcataccount1704033769`cat`post`desc:Sogga, manul or floppa???~timestamp:1704033769~`
+1704034062 | RESPONSE: Success: Vertex added
+1704034066 | REQUEST: 765064237`filter`post``
+1704034066 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704034066 | REQUEST: 994472908`fetchVertexProperties`bingus1704033578`post`
+1704034066 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704034066 | REQUEST: 351454658`fetchVertexProperties`randomcataccount1704033769`post`
+1704034066 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704034066 | REQUEST: 111248928`fetchVertexProperties``post`
+1704034066 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704035341 | REQUEST: 537306949`filter`post``
+1704035341 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704035341 | REQUEST: 542726561`fetchVertexProperties`bingus1704033578`post`
+1704035341 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704035341 | REQUEST: 846918546`fetchVertexProperties`randomcataccount1704033769`post`
+1704035341 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704035341 | REQUEST: 750535331`fetchVertexProperties``post`
+1704035341 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704035342 | REQUEST: 468538369`filter`cat``
+1704035342 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035346 | REQUEST: 524536171`filter`cat``
+1704035346 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035357 | REQUEST: 682221774`filter`cat``
+1704035357 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035561 | REQUEST: 140218499`filter`cat``
+1704035561 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035575 | REQUEST: 538769224`filter`cat``
+1704035575 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035904 | REQUEST: 293466942`filter`post``
+1704035904 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704035904 | REQUEST: 896865858`fetchVertexProperties`bingus1704033578`post`
+1704035904 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704035904 | REQUEST: 386614358`fetchVertexProperties`randomcataccount1704033769`post`
+1704035904 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704035904 | REQUEST: 362530382`fetchVertexProperties``post`
+1704035904 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704035906 | REQUEST: 436999472`filter`cat``
+1704035906 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035938 | REQUEST: 513145638`filter`cat``
+1704035938 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035963 | REQUEST: 421333435`filter`cat``
+1704035963 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704035965 | REQUEST: 821005820`filter`post``
+1704035965 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704035965 | REQUEST: 597453886`fetchVertexProperties`bingus1704033578`post`
+1704035965 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704035965 | REQUEST: 470093082`fetchVertexProperties`randomcataccount1704033769`post`
+1704035965 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704035965 | REQUEST: 323878129`fetchVertexProperties``post`
+1704035965 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704035968 | REQUEST: 351608877`filter`cat``
+1704035968 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704036163 | REQUEST: 223593013`filter`post``
+1704036163 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704036163 | REQUEST: 540090132`fetchVertexProperties`bingus1704033578`post`
+1704036163 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704036163 | REQUEST: 306755593`fetchVertexProperties``post`
+1704036163 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704036163 | REQUEST: 938594049`fetchVertexProperties`randomcataccount1704033769`post`
+1704036163 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704036723 | REQUEST: 323248024`filter`post``
+1704036723 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704036723 | REQUEST: 731733139`fetchVertexProperties`bingus1704033578`post`
+1704036723 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704036723 | REQUEST: 524207001`fetchVertexProperties``post`
+1704036723 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704036723 | REQUEST: 826498163`fetchVertexProperties`randomcataccount1704033769`post`
+1704036723 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704036894 | REQUEST: 992003309`filter`post``
+1704036894 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704036894 | REQUEST: 637784401`fetchVertexProperties`bingus1704033578`post`
+1704036894 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704036894 | REQUEST: 920206563`fetchVertexProperties`randomcataccount1704033769`post`
+1704036894 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704036894 | REQUEST: 486037957`fetchVertexProperties``post`
+1704036894 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704036960 | REQUEST: 332721190`filter`cat``
+1704036960 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704036967 | REQUEST: 744120415`relationalQuery`randomcataccount`cat`post`posts``
+1704036967 | RESPONSE: randomcataccount1704033769~
+1704036967 | REQUEST: 212533438`fetchVertexProperties`randomcataccount1704033769`post`
+1704036967 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704036969 | REQUEST: 305578171`filter`cat``
+1704036969 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704036970 | REQUEST: 465206321`relationalQuery`meevinofficial`cat`post`posts``
+1704036970 | RESPONSE: Failure: No nodes of type post found that have a relation with meevinofficial of type cat and match the provided properties.
+1704036970 | REQUEST: 901593069`fetchVertexProperties`Failure: No nodes of type post found that have a relation with meevinofficial of type cat and match the provided properties.`post`
+1704036970 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704036974 | REQUEST: 823400039`filter`cat``
+1704036974 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704036975 | REQUEST: 981502075`relationalQuery`bingus`cat`post`posts``
+1704036975 | RESPONSE: bingus1704033578~
+1704036975 | REQUEST: 220570130`fetchVertexProperties`bingus1704033578`post`
+1704036975 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704036977 | REQUEST: 817442669`filter`post``
+1704036977 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704036977 | REQUEST: 746588416`fetchVertexProperties`bingus1704033578`post`
+1704036977 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704036977 | REQUEST: 337300646`fetchVertexProperties`randomcataccount1704033769`post`
+1704036977 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704036977 | REQUEST: 337223495`fetchVertexProperties``post`
+1704036977 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704037071 | REQUEST: 886594443`filter`post``
+1704037071 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704037071 | REQUEST: 436271146`fetchVertexProperties`bingus1704033578`post`
+1704037071 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704037071 | REQUEST: 201327052`fetchVertexProperties`randomcataccount1704033769`post`
+1704037071 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704037071 | REQUEST: 563931209`fetchVertexProperties``post`
+1704037071 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704037259 | REQUEST: 603808066`filter`post``
+1704037259 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704037259 | REQUEST: 543488787`fetchVertexProperties`bingus1704033578`post`
+1704037259 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704037259 | REQUEST: 463621397`fetchVertexProperties`randomcataccount1704033769`post`
+1704037259 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704037259 | REQUEST: 150784841`fetchVertexProperties``post`
+1704037259 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704037339 | REQUEST: 734189668`filter`post``
+1704037339 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704037339 | REQUEST: 128938513`fetchVertexProperties`randomcataccount1704033769`post`
+1704037339 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704037339 | REQUEST: 658687622`fetchVertexProperties`bingus1704033578`post`
+1704037339 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704037339 | REQUEST: 524601731`fetchVertexProperties``post`
+1704037339 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704037677 | REQUEST: 131125045`fetchVertexProperties`bingus`cat`
+1704037677 | RESPONSE: username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2
+1704037678 | REQUEST: 645825009`filter`post``
+1704037678 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704037678 | REQUEST: 789826727`fetchVertexProperties`bingus1704033578`post`
+1704037678 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704037678 | REQUEST: 532012897`fetchVertexProperties`randomcataccount1704033769`post`
+1704037678 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704037678 | REQUEST: 613921215`fetchVertexProperties``post`
+1704037678 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704037769 | REQUEST: 164563922`fetchVertexProperties`binugs`cat`
+1704037769 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704037776 | REQUEST: 966812927`fetchVertexProperties`bingus`cat`
+1704037776 | RESPONSE: username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2
+1704037780 | REQUEST: 327979324`fetchVertexProperties`bingus`cat`
+1704037780 | RESPONSE: username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2
+1704037781 | REQUEST: 702972601`filter`post``
+1704037781 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704037781 | REQUEST: 617487378`fetchVertexProperties`bingus1704033578`post`
+1704037781 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704037781 | REQUEST: 910887453`fetchVertexProperties`randomcataccount1704033769`post`
+1704037781 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704037781 | REQUEST: 358761489`fetchVertexProperties``post`
+1704037781 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704039505 | REQUEST: 871733399`filter`post``
+1704039505 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704039505 | REQUEST: 240696263`fetchVertexProperties`bingus1704033578`post`
+1704039505 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704039505 | REQUEST: 927899416`fetchVertexProperties`randomcataccount1704033769`post`
+1704039505 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704039505 | REQUEST: 866750661`fetchVertexProperties``post`
+1704039505 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704039987 | REQUEST: 399467201`filter`post``
+1704039987 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704039987 | REQUEST: 951321671`fetchVertexProperties`bingus1704033578`post`
+1704039987 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704039987 | REQUEST: 317630884`fetchVertexProperties`randomcataccount1704033769`post`
+1704039987 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704039987 | REQUEST: 729487318`fetchVertexProperties``post`
+1704039987 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704040036 | REQUEST: 606648601`filter`post``
+1704040036 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704040037 | REQUEST: 847118346`fetchVertexProperties`bingus1704033578`post`
+1704040037 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704040037 | REQUEST: 551233001`fetchVertexProperties`randomcataccount1704033769`post`
+1704040037 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704040037 | REQUEST: 974256625`fetchVertexProperties``post`
+1704040037 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704041326 | REQUEST: 275681564`fetchVertexProperties`bingus`cat`
+1704041326 | RESPONSE: username:bingus~!password:bestfeline~!email:mujtaba.asim.amin@gmail.com~age:2
+1704041326 | REQUEST: 668155830`filter`post``
+1704041326 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704041326 | REQUEST: 529625580`fetchVertexProperties`bingus1704033578`post`
+1704041326 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704041326 | REQUEST: 778697302`fetchVertexProperties`randomcataccount1704033769`post`
+1704041326 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704041326 | REQUEST: 211485785`fetchVertexProperties``post`
+1704041326 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704041391 | REQUEST: 778718873`filter`post``
+1704041391 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704041391 | REQUEST: 802979567`fetchVertexProperties`bingus1704033578`post`
+1704041391 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704041391 | REQUEST: 611359797`fetchVertexProperties`randomcataccount1704033769`post`
+1704041391 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704041391 | REQUEST: 404714132`fetchVertexProperties``post`
+1704041391 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704041478 | REQUEST: 786042684`filter`post``
+1704041478 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704041478 | REQUEST: 925430391`fetchVertexProperties`bingus1704033578`post`
+1704041478 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704041478 | REQUEST: 881505126`fetchVertexProperties`randomcataccount1704033769`post`
+1704041478 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704041478 | REQUEST: 842215579`fetchVertexProperties``post`
+1704041478 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704041865 | REQUEST: 768280951`filter`cat``
+1704041865 | RESPONSE: bingus~meevinofficial~randomcataccount~
+1704041876 | REQUEST: 512656484`fetchVertexProperties`randomcataccount`cat`
+1704041876 | RESPONSE: username:randomcataccount~!password:newcataccount~!email:mynew_cataccount@gmail.com~age:2
+1704041876 | REQUEST: 781609492`filter`post``
+1704041876 | RESPONSE: bingus1704033578~randomcataccount1704033769~
+1704041876 | REQUEST: 531952389`fetchVertexProperties`bingus1704033578`post`
+1704041876 | RESPONSE: desc:chipi chipi chapa chapa dubi dubi daba magico mi dubi dubi boom boom boom boom.~timestamp:1704033578~
+1704041876 | REQUEST: 925618749`fetchVertexProperties`randomcataccount1704033769`post`
+1704041876 | RESPONSE: desc:Sogga, manul or floppa???~timestamp:1704033769~
+1704041876 | REQUEST: 429442134`fetchVertexProperties``post`
+1704041876 | RESPONSE: Failure: Vertex doesn't exist, can't fetch it.
+1704041879 | REQUEST: 408230809`filter`cat``
+1704041879 | RESPONSE: bingus~meevinofficial~randomcataccount~

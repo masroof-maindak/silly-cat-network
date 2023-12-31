@@ -12,8 +12,8 @@ const PostCard = ({ description, username, timestamp }) => {
           </div>
 
           <div style={{ borderRadius: "0px 0px 10px 10px", padding: "0px 25px", background: "#3a3124" }} className="d-flex justify-content-between">
-            <p style={{ background: "#3A3124" }}>Posted on: {timestamp}</p>
-            <p style={{ background: "#3A3124" }}>Posted by: {username}</p>
+            <p style={{ background: "#3A3124" }}>Posted at: {timestamp}</p>
+            <p style={{ background: "#3A3124" }}>Post ID: {username}</p>
           </div>
 
         </div>

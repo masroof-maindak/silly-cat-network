@@ -144,7 +144,7 @@ void* receiveQuery (void* clientSocketPtr) {
 
 //answer thread
 void* readAnswerQueue(void* arg) {
-    std::chrono::seconds timeout(5);
+    std::chrono::seconds timeout(1);
 
     //forever
     while (true) {

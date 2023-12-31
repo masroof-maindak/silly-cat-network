@@ -34,7 +34,7 @@ int main() {
     // g.fetchVertexProperties(106, "bingus", "cat");
     // g.removeVertex(107, "bingus", "cat");
 
-    // Add follow edge and another cat and query for all cats bingus is following
+    // Add follow edge and query for all cats bingus is following
     // g.addEdge(108, "follows", 0, "bingus", "meevinofficial", "cat", "cat");
     // g.relationalQuery(109, "bingus", "cat", "cat", "follows", "age:2~");
 
@@ -47,7 +47,7 @@ int main() {
 
     // g.fetchVertexProperties(113, "bingus", "cat");
 
-    g.filter(114, "post", "");
+    g.filter(114, "cat", "");
 
     answerQueue.print();
 }

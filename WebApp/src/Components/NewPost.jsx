@@ -19,17 +19,18 @@ const NewPost = ({ visible, onClose }) => {
       axios
         .post(
           APIURL,
+          //send addVE query to server
           generateRandomSixDigitNumber() +
-            "`addVE`posts`0`" +
-            user +
-            "`" +
-            user +
-            currentTimestampInSeconds +
-            "`cat`post`desc:" +
-            values.description +
-            "~timestamp:" +
-            currentTimestampInSeconds +
-            "~`"
+          "`addVE`posts`0`" +
+          user +
+          "`" +
+          user +
+          currentTimestampInSeconds +
+          "`cat`post`desc:" +
+          values.description +
+          "~timestamp:" +
+          currentTimestampInSeconds +
+          "~`"
         )
         .then((res) => {
           if (res.data.toString() === "Success: Vertex added") {
@@ -58,24 +59,29 @@ const NewPost = ({ visible, onClose }) => {
   return (
     <Modal
       visible={visible}
-      title="Whats on your mind"
+      title={<span style={{ color: "#ebe0bb" }}>So eepy...</span>}
       onOk={handleOk}
       onCancel={handleCancel}
+      wrapClassName="new-post-modal"
+
+      style={{ background: "#242015", color: "#ebe0bb", border: "none"}}
+
       footer={[
-        <Button key="cancel" className='btnClass' onClick={handleCancel}>
-          Cancel
+        <Button key="cancel" onClick={handleCancel} style={{ background: "#4d3f32" }}>
+          <span style={{ color: "#ebe0bb", background: "#4d3f32"}}>Cancel</span>
         </Button>,
         <Button
           key="submit"
           type="primary"
           loading={loading}
           onClick={handleOk}
-          className='btnClass'
+          style={{ background: "#db930d", border: "none" }}
         >
-          Post
+          <span style={{ color: "#242015", background: "#db930d" }}>Post</span>
         </Button>,
       ]}
     >
+
       <Form form={form} layout="vertical">
         <Form.Item
           name="description"
@@ -85,9 +91,10 @@ const NewPost = ({ visible, onClose }) => {
             { max: 255, message: "Description cannot exceed 255 characters" },
           ]}
         >
-          <Input.TextArea rows={4} placeholder="Whats on your mind" />
+          <Input.TextArea rows={4} placeholder="255 characters to go..." />
         </Form.Item>
       </Form>
+
     </Modal>
   );
 };
