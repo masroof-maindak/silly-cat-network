@@ -1,0 +1,30 @@
+@import 'fonts.css';
+
+* {
+    background-color: #242015;
+    color: #ebe0bb;
+    font-family: 'Maple Mono', monospace;
+}
+
+/* Colour of text in field */
+::placeholder {
+    font-family: 'Maple Mono', monospace !important;
+    color: #5f4e41 !important;
+}
+
+ 
+/* Colour of text in field while typing */
+input[type="text"],
+input[type="password"] {
+    color: #d2c3a4 !important;
+}
+
+/* Form shit */
+.ant-input {
+    background-color: #242015 !important;
+}
+.swamp-form {
+    background-color: #242015; /* Dark background color */
+    border: 1px solid #3a3124; /* Border color */
+    /* Other desired styles */
+}

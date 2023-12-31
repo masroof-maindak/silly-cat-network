@@ -1,0 +1,7 @@
+@font-face {
+    font-family: 'Maple Mono';
+    src: url('fonts/MapleMono-Regular.woff2') format('woff2'),
+        url('fonts/MapleMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
