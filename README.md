@@ -20,6 +20,8 @@ One index in the prior-mentioned array of B Trees holds only the unique keys of 
 ### Complexity
 Operations pertaining to vertices are particularly efficient, due to the decision to use bTrees, which can achieve logarithmic time complexity (O(log n)) for insertion, deletion, and search operations. This contrasts with linked lists that offer constant time complexity (O(1)) for certain operations like insertion and deletion at the beginning or end but have linear time complexity (O(n)) for searching through elements.
 
+One unfortunate linear time complexity penalty present throughout the entire program is having to parse either a string of vertices/edges separated by a delimiter or parsing string for properties. A proper JSON implementation would certainly ameliorate this problem. One step taken that does slightly help with this problem is the use of a hashmap in the 'mergeVertex' function to check/update key-value format properties in constant time.
+
 ### Connections
 The database/server advertises port #9989 which a client can connect to. The client (application backend), upon receiving a POST request from the React webapp (via the REST API credited below), initializes a new client socket, binds it to the aforementioned server socket, transmits the query as is, receives a response from the server, and forwards it unconditionally.
 

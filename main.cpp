@@ -15,22 +15,19 @@
 #define BUFFER_SIZE 512
 const char delimiter = '`';
 
-//structs
 struct answer {
     int transactionID;
     std::string retMessage;
 };
 
-//global queues
-Queue<std::string> filesBeingProcessed;
-Queue<answer> answerQueue;
+Queue<answer> answerQueue; // Global answer queue
 
 #include "graph.h"
 
 graph g(0);
 
 //client thread
-void* receiveImage(void* clientSocketPtr) {
+void* receiveQuery (void* clientSocketPtr) {
     int clientSocket = *((int*)clientSocketPtr);
     free(clientSocketPtr);
     std::ofstream logger("_data/logs.txt", std::ios::app);
@@ -127,9 +124,8 @@ void* receiveImage(void* clientSocketPtr) {
                 //and exit the whileloop
                 break;
             }
-        } else {
+        } else
             usleep(SLEEP_TIME); 
-        }
     }
 
     //send the feedback message to the client
@@ -165,10 +161,9 @@ void* readAnswerQueue(void* arg) {
                     //check elapsed time
                     auto elapsed_time = std::chrono::steady_clock::now() - startTime;
                     //if it exceeds our time out value
-                    if (elapsed_time >= timeout) {
+                    if (elapsed_time >= timeout)
                         //leave inner while
                         break;
-                    }
 
                     // Sleep for a short duration to avoid busy-waitings
                     struct timespec sleepTime;
@@ -183,9 +178,8 @@ void* readAnswerQueue(void* arg) {
                 answerQueue.pop();
                 std::cout << "Popped value: " << currAns << "; Client might have disconnected" << std::endl;
             }
-        } else {
+        } else
             usleep(SLEEP_TIME);
-        }
     }
     return NULL;
 }
@@ -249,7 +243,7 @@ int main() {
 
         //send each client to a new thread
         pthread_t clientThread;
-        if (pthread_create(&clientThread, NULL, receiveImage, (void*)clientSocket) != 0) {
+        if (pthread_create(&clientThread, NULL, receiveQuery, (void*)clientSocket) != 0) {
             perror("Thread creation failed"); 
             return 1;
         }
