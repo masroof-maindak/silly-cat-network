@@ -1,11 +1,10 @@
-/* “An idiot admires complexity, a genius admires simplicity" ~ Terry Davis. */
-
 #ifndef GRAPH_H
 #define GRAPH_H
 
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <filesystem>
 #include <unordered_map>
 
 #include "../lib/LinkedList.h"
@@ -13,8 +12,7 @@
 #include "../lib/bTree/bTree.h"
 
 void makeDir(std::string path, std::string newDirName) {
-    std::string command = "mkdir -p " + path + newDirName;
-    system(command.c_str());
+    std::filesystem::create_directory(path + newDirName);
 }
 
 class graph {
@@ -540,9 +538,6 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
 
         bTreeArray.push_back(newT);
 
-        bTree testT = bTreeArray[bTreeArray.size() - 1];
-        
-        
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize() - 1;
     }
@@ -569,7 +564,6 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
     //scan string for a value that starts with '!', replace it with its output after badHasher()
     checkStringForEncryptables(_vertexProperties, 0);
     
-
     //write string size
     int stringSize = _vertexProperties.size();
     file.write( (char*)&stringSize, sizeof(int));
