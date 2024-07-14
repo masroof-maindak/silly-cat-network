@@ -8,7 +8,6 @@ int main(void) {
 
     Server svr;
 
-    //upon receiving a POST request to /content_receiver
     svr.Post("/content_receiver", [&](const httplib::Request &req, httplib::Response &res, const httplib::ContentReader &content_reader) {
         if (req.is_multipart_form_data()) {
             //for JSON data
@@ -31,23 +30,19 @@ int main(void) {
             serverAddr.sin_family = AF_INET;    // ipv4
             serverAddr.sin_port = htons(9989);  // port
 
-            //convert human-readable string to binary network address structure
             if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) < 1) {
                 perror("Invalid address or address not supported");
                 exit(EXIT_FAILURE);
             }
 
-            //connect client to server (DB) via sockets
             if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
                 perror("Connection failed");
                 exit(EXIT_FAILURE);
             }
 
-            // Generate query to send to server
             std::string query = body;
             std::cout << "QUERY WE ARE SENDING TO DB: " << query << "\n";
 
-            // Send query to server
             int stringSize = query.size();
             if (send(clientSocket, &query[0], stringSize, 0) == -1) {
                 perror("Sending query to server failed");
@@ -55,7 +50,6 @@ int main(void) {
                 exit(EXIT_FAILURE);
             }
 
-            // Recieve feedback/answer string from server in a char buffer,
             char* buffer = new char[BUFFER_SIZE];
             std::memset(buffer, 0, BUFFER_SIZE);
             int bytesRead = 10;
@@ -75,12 +69,10 @@ int main(void) {
 
             close(clientSocket);
             
-            // Set CORS headers
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
             res.set_header("Access-Control-Allow-Headers", "Content-Type");
 
-            // Set response content type and body
             res.set_content(serverResponse, "application/json");
         }
     });
