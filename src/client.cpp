@@ -1,7 +1,7 @@
 #include "../lib/cpp-httplib/httplib.h"
 #include <iostream>
 
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 1024
 
 int main(void) {
     using namespace httplib;
