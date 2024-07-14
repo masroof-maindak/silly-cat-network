@@ -62,18 +62,11 @@ private:
     // Get the index of that TYPE of {vertex,edge}. If it doesn't exist, put it in the relevant type
     // list, push its entry into {bTreeArray,adjList/[edgetype]/} and return the final (newly added) index
     int getIndexOfTypeOfVertex(std::string _vertexTypeLabel);
-    int getIndexOfTypeOfEdge(std::string label);
+    int getIndexOfTypeOfEdge(std::string _edgeTypeLabel);
 
-    // Write all the data structures to disk
-    void dumpGraphData();
-
-    // Used in merge()
+    void dumpGraphToDisk();
     void updateVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties);
-
-    // Used to check properties of a vertex, used in filtering
     std::string fetchProperties(std::string uniqueKey);
-
-    // Genereates a hashmap of properties to match from a string of properties
     std::unordered_map<std::string, std::string> generatePropertiesToMatch(std::string _propertiesToMatch);
 
 public:
@@ -113,7 +106,7 @@ public:
     **  Refactor functions to wait if the file they're trying to access is in the filesBeingProcessedQueue (include a while loop that checks if the file is in the queue, if it is, sleep for 0.4s)
     */
 
-   ~graph() { dumpGraphData(); }
+   ~graph() { dumpGraphToDisk(); }
 };
 
 void graph::removeVE(int transactionID, std::string _edgeTypeLabel, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
@@ -391,7 +384,7 @@ bool graph::removeVertex(int transactionID, std::string uniqueKey, std::string _
     return false;
 }
 
-void graph::dumpGraphData() {
+void graph::dumpGraphToDisk() {
     // Write vertex and edge type lists unconditionally with LL::writeToFile()
     vertexTypeList.writeToFile("_data/vertexTypes.txt");
     edgeTypeList.writeToFile("_data/edgeTypes.txt");
@@ -416,12 +409,12 @@ graph::graph(int fileCheckFlag) {
     // No need to do anything for adj lists, they will be created/read/modified on the fly
 }
 
-int graph::getIndexOfTypeOfEdge(std::string label) {
-    int ans = edgeTypeList.findIndex(label);
+int graph::getIndexOfTypeOfEdge(std::string _edgeTypelabel) {
+    int ans = edgeTypeList.findIndex(_edgeTypelabel);
     if (ans == -1) {
-        edgeTypeList.insert(label);
-        makeDir("_data/adjLists/", label);
-        std::ofstream file("_data/adjLists/" + label + "/infofile.txt");
+        edgeTypeList.insert(_edgeTypelabel);
+        makeDir("_data/adjLists/", _edgeTypelabel);
+        std::ofstream file("_data/adjLists/" + _edgeTypelabel + "/infofile.txt");
         file.close();
         ans = edgeTypeList.getSize() - 1;
     }
@@ -430,26 +423,21 @@ int graph::getIndexOfTypeOfEdge(std::string label) {
 
 bool graph::addEdge (int transactionID, std::string relation, bool bidirectional, std::string _vertex1ID, std::string _vertex2ID, std::string _vertex1Type, std::string _vertex2Type) {
 
-    // Check if vertex1 and vertex2 exist in our bTrees
     int vertex1Type = vertexTypeList.findIndex(_vertex1Type);
     int vertex2Type = vertexTypeList.findIndex(_vertex2Type);
 
-    //if either of the vertex types don't exist, what are we supposed to be adding an edge to?
     if(vertex1Type == -1 or vertex2Type == -1) {
         answerQueue.push({transactionID, "Failure: Vertex type doesn't exist, so edge can't exist either."});
         return false;
     }
 
-    //check if both vertices exist in their respective bTrees
     if (bTreeArray[vertex1Type].search(_vertex1ID) == -1 or bTreeArray[vertex2Type].search(_vertex2ID) == -1) {
         answerQueue.push({transactionID, "Failure: Vertex doesn't exist, can't add edge to it."});
         return false;
     }
 
-    // label is brought to format "Relation-typeX_typeY"
     std::string completeLabel = relation + "-" + _vertex1Type + "_" + _vertex2Type;
 
-    // first identify the TYPE of the edge from the edgeTypeList, this will also make the directory for that edge if it doesn't exist
     int edgeType = getIndexOfTypeOfEdge(completeLabel);
 
     //go to that directory's infofile.txt and check if the vertex1ID exists in it
@@ -462,65 +450,38 @@ bool graph::addEdge (int transactionID, std::string relation, bool bidirectional
 
     // if vertex1ID doesn't exist in the infofile.txt, create a new file for it and add vertex2ID to it
     if (!vertex1Exists) {
-
-        //create a new file for vertex1ID
         std::ofstream file(dir + _vertex1ID + ".txt");
-        
-        //add vertex2ID to it
         file << _vertex2ID << "\n";
         file.close();
-        
-        //add vertex1ID to info LL
         info.insert(_vertex1ID);
-
     } else {
-        //open the file for vertex1ID
         LL vertex1AdjList(dir + _vertex1ID + ".txt");
-
-        //if vertex2ID already exists in vertex1's adjList, return false
         if (vertex1AdjList.exists(_vertex2ID)) {
             answerQueue.push({transactionID, "Failure: unidirectional edge already exists, can't add it again."});
             return false;
-        }
-
-        //else insert it
-        else {
+        } else {
             vertex1AdjList.insert(_vertex2ID);
-
-            // and write changes to disk
             vertex1AdjList.writeToFile(dir + _vertex1ID + ".txt");
         }
     }
 
     if (bidirectional) {
-        //we've already guaranteed that vertex1 and vertex2 are real.
-        //and if the relation is bidrectional, it's almost certain that vertex1ID won't exist in vertex2ID's adjList
-        //so we can just append vertex1ID to vertex2ID's adjList without checking
+        // we've already guaranteed that vertex1 and vertex2 are real.
+        // and if the relation is bidrectional, it's almost certain that vertex1ID won't exist in vertex2ID's adjList
+        // so we can just append vertex1ID to vertex2ID's adjList without checking
 
         if (!vertex2Exists) {
-            //insert it in info file
             info.insert(_vertex2ID);
-
-            //create a new file for vertex2ID
             std::ofstream file(dir + _vertex2ID + ".txt");
-
-            //add vertex1ID to it
             file << _vertex1ID << "\n";
             file.close();
-
         } else {
-            //open the file for vertex2ID
             LL vertex2AdjList(dir + _vertex2ID + ".txt");
-
-            //insert vertex1ID
             vertex2AdjList.insert(_vertex1ID);
-
-            // and write changes to disk
             vertex2AdjList.writeToFile(dir + _vertex2ID + ".txt");
         }
     }
     
-    //update info file
     info.writeToFile(dir + "infofile.txt");
 
     std::string feedback = "Success: edge added ";
@@ -533,11 +494,8 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
     int ans = vertexTypeList.findIndex(_vertexTypeLabel);
     if (ans == -1) {
         vertexTypeList.insert(_vertexTypeLabel);
-
         bTree newT (_vertexTypeLabel);
-
         bTreeArray.push_back(newT);
-
         makeDir("_data/bTrees/", _vertexTypeLabel);
         ans = vertexTypeList.getSize() - 1;
     }
@@ -545,11 +503,8 @@ int graph::getIndexOfTypeOfVertex(std::string _vertexTypeLabel) {
 }
 
 bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string _vertexProperties) {
-
-    // Identify the TYPE of the vertex from the vertexTypeList
+    
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
-
-    // Search in B tree array at vertexType-th index and check if that vertex exists already
     if (bTreeArray[vertexType].search(uniqueKey) != -1) {
         answerQueue.push({transactionID, "Failure: Vertex already exists, can't add it again."});
         return false;
@@ -561,14 +516,11 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
     std::string writePath = "_data/vertexProperties/" + uniqueKey + ".bin";
     std::ofstream file(writePath, std::ios::binary);
     
-    //scan string for a value that starts with '!', replace it with its output after badHasher()
     checkStringForEncryptables(_vertexProperties, 0);
     
-    //write string size
     int stringSize = _vertexProperties.size();
-    file.write( (char*)&stringSize, sizeof(int));
+    file.write((char*)&stringSize, sizeof(int));
 
-    //write properties string
     file.write(&_vertexProperties[0], _vertexProperties.size());
     file.close();
 
@@ -577,37 +529,31 @@ bool graph::addVertex (int transactionID, std::string uniqueKey, std::string _ve
 }
 
 std::string graph::fetchProperties (std::string uniqueKey) {
-    //This function assumes that the vertex exists, and is called only after checking that it does
+    //This function assumes that the vertex exists
+
     std::ifstream file("_data/vertexProperties/" + uniqueKey + ".bin", std::ios::binary);
 
-    //read string size
     int stringSize;
     file.read((char*)&stringSize, sizeof(int));
 
-    //read string contents
     std::string properties; 
     properties.resize(stringSize);
     file.read(&properties[0], stringSize);
 
-    //decrypt data if needed
     checkStringForEncryptables(properties, 1);
 
-    //return string
     file.close();
     return properties;
 }
 
 void graph::updateVertex(int transactionID, std::string uniqueKey, std::string _vertexTypeLabel, std::string newProperties) {
     
-    //first read info from file
     std::string readPath = "_data/vertexProperties/" + uniqueKey + ".bin";
     std::ifstream file(readPath, std::ios::binary);
     
-    // Read int size to get string size
     int fileSize;
     file.read((char*)&fileSize, sizeof(int));
 
-    // Read the file into a string and close
     std::string oldProperties; oldProperties.resize(fileSize);
     file.read(&oldProperties[0], fileSize);
     file.close();
@@ -617,11 +563,9 @@ void graph::updateVertex(int transactionID, std::string uniqueKey, std::string _
     // Split them by '~' and then by ':'
     std::unordered_map<std::string, std::string> oldPropertiesMap, newPropertiesMap;
 
-    // Split the oldProperties string by '~'
     std::stringstream oldProp (oldProperties);
     std::string keyValueString;
     while (std::getline (oldProp, keyValueString, '~')) {
-        // Split the keyValueString string by ':'
         std::string key, value;
         std::stringstream ss2(keyValueString);
         std::getline(ss2, key, ':');
@@ -630,32 +574,25 @@ void graph::updateVertex(int transactionID, std::string uniqueKey, std::string _
     }
 
     std::stringstream newProp(newProperties);
-    // Split the newProperties string by '~'
     while (std::getline(newProp, keyValueString, '~')) {
-        // Split the keyValueString string by ':'
         std::string key, value;
         std::stringstream ss4(keyValueString);
         std::getline(ss4, key, ':');
         std::getline(ss4, value, ':');
 
-        //if such a 'value' exists that is prepended by '!', 
-        //pass it through the hasher to encrypt it before writing
-        if (key[0] == '!') //e.g !password
+        if (key[0] == '!') //e.g `!password`
             badHasher(value);
 
         newPropertiesMap[key] = value;
     }
 
-    // Go through through newProperties and update oldProperties
     for (auto it = newPropertiesMap.begin(); it != newPropertiesMap.end(); it++)
         oldPropertiesMap[it->first] = it->second;
 
-    // Coalesce hashmap into a string
     std::string properties;
     for (auto it = oldPropertiesMap.begin(); it != oldPropertiesMap.end(); it++)
         properties += it->first + ":" + it->second + "~";
 
-    // Write the string to the file
     std::ofstream file2(readPath, std::ios::binary);
     int stringSize = properties.size();
     file2.write((char*)&stringSize, sizeof(int));
@@ -669,7 +606,6 @@ void graph::mergeVertex(int transactionID, std::string uniqueKey, std::string _v
 
     int vertexType = getIndexOfTypeOfVertex(_vertexTypeLabel);
 
-    // Search in B tree array at vertexType-th index and check if that vertex exists already
     if (bTreeArray[vertexType].search(uniqueKey) == -1)
         addVertex (transactionID, uniqueKey, _vertexTypeLabel, _vertexProperties);
     else

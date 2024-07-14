@@ -8,10 +8,10 @@ int main(void) {
 
     Server svr;
 
-    //upon receiving a POST request to /content_receiver...
+    //upon receiving a POST request to /content_receiver
     svr.Post("/content_receiver", [&](const httplib::Request &req, httplib::Response &res, const httplib::ContentReader &content_reader) {
         if (req.is_multipart_form_data()) {
-            //for JSON data (I think)
+            //for JSON data
         } else {
             std::string body;
             content_reader([&](const char *data, size_t data_length) {
@@ -25,22 +25,25 @@ int main(void) {
                 perror("Socket creation failed");
                 exit(EXIT_FAILURE);
             }
+
             //bind it
             sockaddr_in serverAddr;
-            serverAddr.sin_family = AF_INET; //ipv4
-            serverAddr.sin_port = htons(9989); //port 9989
+            serverAddr.sin_family = AF_INET;    // ipv4
+            serverAddr.sin_port = htons(9989);  // port
+
             //convert human-readable string to binary network address structure
             if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) < 1) {
                 perror("Invalid address or address not supported");
                 exit(EXIT_FAILURE);
             }
+
             //connect client to server (DB) via sockets
             if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
                 perror("Connection failed");
                 exit(EXIT_FAILURE);
             }
 
-            //generate query to send to server
+            // Generate query to send to server
             std::string query = body;
             std::cout << "QUERY WE ARE SENDING TO DB: " << query << "\n";
 
@@ -56,7 +59,7 @@ int main(void) {
             char* buffer = new char[BUFFER_SIZE];
             std::memset(buffer, 0, BUFFER_SIZE);
             int bytesRead = 10;
-            // /*
+
             bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
             if (bytesRead == -1) {
                 perror("Failed to recieve message");
@@ -66,14 +69,13 @@ int main(void) {
                 exit(1);
             }
             
-            // trim buffer down to length
             std::string serverResponse = std::string(buffer, bytesRead);
             delete[] buffer;
             std::cout << "RESPONSE WE GOT FROM THE SERVER: " << serverResponse << "\n\n";
 
             close(clientSocket);
             
-            // Set CORS headers if needed
+            // Set CORS headers
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
             res.set_header("Access-Control-Allow-Headers", "Content-Type");
