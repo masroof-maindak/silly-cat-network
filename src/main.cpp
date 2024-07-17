@@ -71,7 +71,7 @@ void* receiveQuery (void* clientSocketPtr) {
     * Except for the filter and relationalQuery functions, which will push the answer to the answer queue
     */
 
-   if (functionToCall == "addVertex") {
+    if (functionToCall == "addVertex") {
         //arguments: transactionID, vertexID, vertexType, vertexProperties
         g.addVertex(transaID, arguments[0], arguments[1], arguments[2]);
     } else if (functionToCall == "addEdge") {
